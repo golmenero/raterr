@@ -1,0 +1,18 @@
+services:
+  raterr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: raterr
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    environment:
+      PORT: ${PORT:-8080}
+      SQLITE_DB_PATH: ${SQLITE_DB_PATH:-/data/raterr.db}
+      TMDB_API_KEY: ${TMDB_API_KEY}
+    volumes:
+      - raterr_data:/data
+
+volumes:
+  raterr_data:
+

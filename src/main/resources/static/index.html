@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Raterr - Buscar</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<h1>Raterr</h1>
+<nav>
+    <a href="/index.html">Buscar</a>
+    <a href="/top.html">Tops</a>
+</nav>
+
+<div class="container">
+    <h2>Buscar película</h2>
+    <div class="search-box">
+        <input id="q" type="text" placeholder="Ej: Inception" autocomplete="off">
+        <div id="sugerencias" class="suggestions hidden"></div>
+    </div>
+    <button onclick="buscar()">Buscar</button>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+let debounceTimer;
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function ocultarSugerencias() {
+    const box = document.getElementById('sugerencias');
+    box.classList.add('hidden');
+    box.innerHTML = '';
+}
+
+async function cargarSugerencias() {
+    const q = document.getElementById('q').value.trim();
+    const box = document.getElementById('sugerencias');
+
+    if (q.length < 2) {
+        ocultarSugerencias();
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/search/suggestions?q=' + encodeURIComponent(q) + '&limit=5');
+        if (!res.ok) {
+            ocultarSugerencias();
+            return;
+        }
+
+        const suggestions = await res.json();
+        if (!Array.isArray(suggestions) || suggestions.length === 0) {
+            ocultarSugerencias();
+            return;
+        }
+
+        box.innerHTML = suggestions.map((m) => `
+            <button class="suggestion-item" data-id="${m.tmdbId}">
+                <span>${escapeHtml(m.title)}</span>
+                <small>${m.releaseYear || '-'}</small>
+            </button>
+        `).join('');
+
+        box.classList.remove('hidden');
+    } catch (_) {
+        ocultarSugerencias();
+    }
+}
+
+function seleccionarPelicula(tmdbId, title) {
+    document.getElementById('q').value = title;
+    ocultarSugerencias();
+    window.location.href = '/rate.html?id=' + tmdbId;
+}
+
+async function buscar() {
+    const q = document.getElementById('q').value.trim();
+    if (!q) return;
+
+    const res = await fetch('/api/search?q=' + encodeURIComponent(q));
+    const movies = await res.json();
+
+    let html = '';
+    if (movies.length === 0) {
+        html = '<p>Sin resultados</p>';
+    } else {
+        for (let m of movies) {
+            html += `
+                <div class="movie">
+                    <h3>${m.title}</h3>
+                    <p>Año: ${m.releaseYear || '-'}</p>
+                    <a href="/rate.html?id=${m.tmdbId}">Valorar</a>
+                </div>
+            `;
+        }
+    }
+    document.getElementById('resultado').innerHTML = html;
+}
+
+document.getElementById('q').addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(cargarSugerencias, 250);
+});
+
+document.getElementById('q').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') buscar();
+});
+
+document.getElementById('sugerencias').addEventListener('click', (e) => {
+    const button = e.target.closest('.suggestion-item');
+    if (!button) return;
+    const title = button.querySelector('span')?.textContent || '';
+    seleccionarPelicula(button.dataset.id, title);
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-box')) {
+        ocultarSugerencias();
+    }
+});
+</script>
+</body>
+</html>
+

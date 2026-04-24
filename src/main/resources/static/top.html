@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Raterr - Tops</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<h1>Raterr</h1>
+<nav>
+    <a href="/index.html">Buscar</a>
+    <a href="/top.html">Tops</a>
+</nav>
+
+<div class="container">
+    <h2>Tops</h2>
+    <label>Año (opcional): <input id="year" type="number" min="1900" max="2100"></label>
+    <label>Límite: <input id="limit" type="number" value="10" min="1" max="100"></label>
+    <button onclick="cargarTops()">Cargar</button>
+
+    <div id="lista"></div>
+</div>
+
+<script>
+async function cargarTops() {
+    const year = document.getElementById('year').value;
+    const limit = document.getElementById('limit').value || 10;
+
+    let url = '/api/tops?limit=' + limit;
+    if (year) url += '&year=' + year;
+
+    const res = await fetch(url);
+    const tops = await res.json();
+
+    let html = '';
+    if (tops.length === 0) {
+        html = '<p>Sin resultados</p>';
+    } else {
+        html = '<ol>';
+        for (let m of tops) {
+            html += `
+                <li>
+                    <div>
+                        ${m.title} (${m.releaseYear || '-'}) - Media: ${m.averageScore}
+                        <button class="danger-button small" onclick="eliminarValoracion(${m.tmdbId})">Eliminar item</button>
+                    </div>
+                </li>
+            `;
+        }
+        html += '</ol>';
+    }
+    document.getElementById('lista').innerHTML = html;
+}
+
+async function eliminarValoracion(tmdbId) {
+    const confirmacion = window.confirm('Esta seguro de eliminar esta valoracion?');
+    if (!confirmacion) return;
+
+    const res = await fetch('/api/movie/' + tmdbId + '/rating', {
+        method: 'DELETE'
+    });
+
+    if (!res.ok) {
+        window.alert('No se pudo eliminar el item.');
+        return;
+    }
+
+    await cargarTops();
+}
+
+cargarTops();
+</script>
+</body>
+</html>

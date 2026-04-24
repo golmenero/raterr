@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Raterr - Valorar</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<h1>Raterr</h1>
+<nav>
+    <a href="/index.html">Buscar</a>
+    <a href="/top.html">Tops</a>
+</nav>
+
+<div class="container">
+    <h2 id="title">Valorar película</h2>
+    <p id="meta"></p>
+
+    <div>
+        <label>Dirección: <input id="dir" type="number" min="1" max="10" value="8"></label>
+        <label>Fotografía: <input id="foto" type="number" min="1" max="10" value="8"></label>
+        <label>Actuación: <input id="act" type="number" min="1" max="10" value="8"></label>
+        <label>Banda sonora: <input id="banda" type="number" min="1" max="10" value="8"></label>
+        <label>Guión: <input id="guion" type="number" min="1" max="10" value="8"></label>
+        <br><br>
+        <button id="btnGuardar" onclick="guardar()">Guardar</button>
+    </div>
+
+    <p id="msg"></p>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+
+if (!id) {
+    document.getElementById('msg').textContent = 'Falta ID de película';
+} else {
+    cargarPelicula();
+}
+
+async function cargarPelicula() {
+    const res = await fetch('/api/movie/' + id);
+    if (!res.ok) {
+        document.getElementById('msg').textContent = 'No encontrada';
+        return;
+    }
+    const m = await res.json();
+    document.getElementById('title').textContent = 'Valorar: ' + m.title;
+    document.getElementById('meta').textContent = 'Media: ' + (m.averageScore || 0);
+
+    const btnGuardar = document.getElementById('btnGuardar');
+    if ((m.ratingsCount || 0) > 0) {
+        btnGuardar.disabled = true;
+        document.getElementById('msg').textContent = 'Ya existe una valoracion. Eliminala desde Tops para volver a valorar.';
+    } else {
+        btnGuardar.disabled = false;
+    }
+}
+
+async function guardar() {
+    const payload = {
+        tmdbId: parseInt(id),
+        direccion: parseInt(document.getElementById('dir').value),
+        fotografia: parseInt(document.getElementById('foto').value),
+        actuacion: parseInt(document.getElementById('act').value),
+        bandaSonora: parseInt(document.getElementById('banda').value),
+        guion: parseInt(document.getElementById('guion').value)
+    };
+
+    const res = await fetch('/api/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        const data = await res.json();
+        document.getElementById('msg').textContent = '✓ Guardado. Nueva media: ' + data.averageScore;
+        document.getElementById('meta').textContent = 'Media: ' + (data.averageScore || 0);
+        document.getElementById('btnGuardar').disabled = true;
+    } else if (res.status === 409) {
+        const err = await res.json();
+        document.getElementById('msg').textContent = '✗ ' + (err.message || 'Ya existe una valoracion para esta pelicula');
+        document.getElementById('btnGuardar').disabled = true;
+    } else {
+        document.getElementById('msg').textContent = '✗ Error al guardar';
+    }
+}
+</script>
+</body>
+</html>
