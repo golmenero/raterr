@@ -2,30 +2,72 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raterr - Buscar</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<h1>Raterr</h1>
-<nav>
-    <a href="/index.html">Buscar</a>
-    <a href="/top.html">Tops</a>
-</nav>
+<div class="page-shell">
+    <header class="site-header">
+        <a class="brand" href="/index.html">
+            <span class="brand-mark">R</span>
+            <span class="brand-copy">
+                <span class="brand-title">Raterr</span>
+                <span class="brand-subtitle">Busca, valora y ordena películas</span>
+            </span>
+        </a>
 
-<div class="container">
-    <h2>Buscar película</h2>
-    <div class="search-box">
-        <input id="q" type="text" placeholder="Ej: Inception" autocomplete="off">
-        <div id="sugerencias" class="suggestions hidden"></div>
-    </div>
-    <button onclick="buscar()">Buscar</button>
+        <nav class="site-nav" aria-label="Navegación principal">
+            <a class="nav-link active" href="/index.html">Buscar</a>
+            <a class="nav-link" href="/top.html">Tops</a>
+            <span class="nav-chip">TMDB + rating propio</span>
+        </nav>
+    </header>
 
-    <div id="resultado"></div>
+    <main class="main-stack">
+        <section class="hero-card">
+            <span class="eyebrow">Raterr · Descubre mejor</span>
+
+            <div class="hero-content">
+                <div>
+                    <h1 class="hero-title">Encuentra una película y valórala en segundos.</h1>
+                    <p class="hero-description">
+                        Una experiencia más limpia, directa y agradable para descubrir títulos en TMDB,
+                        registrar una valoración única y revisar tus tops sin ruido innecesario.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel search-panel">
+            <div>
+                <label class="field-label" for="q">Buscar película</label>
+                <p class="helper-text">Escribe un título y pulsa Buscar o Enter para cargar los resultados.</p>
+            </div>
+
+            <div class="search-row">
+                <div class="search-box">
+                    <input id="q" type="text" placeholder="Ej: Inception, Interstellar, Dune..." autocomplete="off">
+                </div>
+                <button class="primary-button" type="button" onclick="buscar()">Buscar</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Resultados</h2>
+                    <p id="resultadoMeta">Todavía no has hecho una búsqueda.</p>
+                </div>
+            </div>
+            <div id="resultado" class="results-grid">
+                <div class="empty-state">Empieza escribiendo el nombre de una película para ver resultados aquí.</div>
+            </div>
+        </section>
+    </main>
 </div>
 
 <script>
-let debounceTimer;
-
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -35,99 +77,78 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
-function ocultarSugerencias() {
-    const box = document.getElementById('sugerencias');
-    box.classList.add('hidden');
-    box.innerHTML = '';
+function posterUrl(path) {
+    return path ? 'https://image.tmdb.org/t/p/w500' + path : '';
 }
 
-async function cargarSugerencias() {
-    const q = document.getElementById('q').value.trim();
-    const box = document.getElementById('sugerencias');
+function getInitials(title) {
+    return (title || '?').trim().charAt(0).toUpperCase();
+}
 
-    if (q.length < 2) {
-        ocultarSugerencias();
+function renderResultados(movies, query) {
+    const meta = document.getElementById('resultadoMeta');
+    const container = document.getElementById('resultado');
+
+    if (!Array.isArray(movies) || movies.length === 0) {
+        meta.textContent = query ? 'No encontramos coincidencias para "' + query + '".' : 'Sin resultados.';
+        container.innerHTML = '<div class="empty-state">Prueba con otro título, año o nombre original.</div>';
         return;
     }
 
-    try {
-        const res = await fetch('/api/search/suggestions?q=' + encodeURIComponent(q) + '&limit=5');
-        if (!res.ok) {
-            ocultarSugerencias();
-            return;
-        }
+    meta.textContent = movies.length + ' resultado' + (movies.length === 1 ? '' : 's') + ' para "' + query + '".';
+    container.innerHTML = movies.map((m) => {
+        const poster = posterUrl(m.posterPath);
+        const overview = m.overview && m.overview.trim().length > 0
+            ? escapeHtml(m.overview)
+            : 'Sin sinopsis disponible por ahora.';
 
-        const suggestions = await res.json();
-        if (!Array.isArray(suggestions) || suggestions.length === 0) {
-            ocultarSugerencias();
-            return;
-        }
-
-        box.innerHTML = suggestions.map((m) => `
-            <button class="suggestion-item" data-id="${m.tmdbId}">
-                <span>${escapeHtml(m.title)}</span>
-                <small>${m.releaseYear || '-'}</small>
-            </button>
-        `).join('');
-
-        box.classList.remove('hidden');
-    } catch (_) {
-        ocultarSugerencias();
-    }
-}
-
-function seleccionarPelicula(tmdbId, title) {
-    document.getElementById('q').value = title;
-    ocultarSugerencias();
-    window.location.href = '/rate.html?id=' + tmdbId;
+        return `
+            <article class="result-card">
+                <div class="poster-frame">
+                    ${poster
+                        ? `<img src="${poster}" alt="Póster de ${escapeHtml(m.title)}">`
+                        : `<div class="poster-fallback">${escapeHtml(getInitials(m.title))}</div>`}
+                </div>
+                <div class="result-content">
+                    <div class="tag-row">
+                        <span class="tag">${m.releaseYear || 'Año desconocido'}</span>
+                        <span class="tag">Media ${m.averageScore || 0}</span>
+                    </div>
+                    <h3 class="result-title">${escapeHtml(m.title)}</h3>
+                    <p class="result-overview">${overview}</p>
+                    <a class="secondary-button" href="/rate.html?id=${m.tmdbId}">Abrir valoración</a>
+                </div>
+            </article>
+        `;
+    }).join('');
 }
 
 async function buscar() {
     const q = document.getElementById('q').value.trim();
     if (!q) return;
 
-    const res = await fetch('/api/search?q=' + encodeURIComponent(q));
-    const movies = await res.json();
+    const meta = document.getElementById('resultadoMeta');
+    meta.textContent = 'Buscando...';
 
-    let html = '';
-    if (movies.length === 0) {
-        html = '<p>Sin resultados</p>';
-    } else {
-        for (let m of movies) {
-            html += `
-                <div class="movie">
-                    <h3>${m.title}</h3>
-                    <p>Año: ${m.releaseYear || '-'}</p>
-                    <a href="/rate.html?id=${m.tmdbId}">Valorar</a>
-                </div>
-            `;
+    try {
+        const res = await fetch('/api/search?q=' + encodeURIComponent(q));
+        if (!res.ok) {
+            document.getElementById('resultado').innerHTML = '<div class="empty-state">No se pudo completar la búsqueda.</div>';
+            meta.textContent = 'Error al cargar resultados.';
+            return;
         }
-    }
-    document.getElementById('resultado').innerHTML = html;
-}
 
-document.getElementById('q').addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(cargarSugerencias, 250);
-});
+        const movies = await res.json();
+        renderResultados(movies, q);
+    } catch (_) {
+        document.getElementById('resultado').innerHTML = '<div class="empty-state">Se perdió la conexión al buscar resultados.</div>';
+        meta.textContent = 'Error de red.';
+    }
+}
 
 document.getElementById('q').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') buscar();
 });
-
-document.getElementById('sugerencias').addEventListener('click', (e) => {
-    const button = e.target.closest('.suggestion-item');
-    if (!button) return;
-    const title = button.querySelector('span')?.textContent || '';
-    seleccionarPelicula(button.dataset.id, title);
-});
-
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.search-box')) {
-        ocultarSugerencias();
-    }
-});
 </script>
 </body>
 </html>
-

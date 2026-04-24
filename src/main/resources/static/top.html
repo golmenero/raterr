@@ -2,68 +2,176 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raterr - Tops</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<h1>Raterr</h1>
-<nav>
-    <a href="/index.html">Buscar</a>
-    <a href="/top.html">Tops</a>
-</nav>
+<div class="page-shell">
+    <header class="site-header">
+        <a class="brand" href="/index.html">
+            <span class="brand-mark">R</span>
+            <span class="brand-copy">
+                <span class="brand-title">Raterr</span>
+                <span class="brand-subtitle">Ranking limpio de tus valoraciones</span>
+            </span>
+        </a>
 
-<div class="container">
-    <h2>Tops</h2>
-    <label>Año (opcional): <input id="year" type="number" min="1900" max="2100"></label>
-    <button onclick="cargarTops()">Cargar</button>
+        <nav class="site-nav" aria-label="Navegación principal">
+            <a class="nav-link" href="/index.html">Buscar</a>
+            <a class="nav-link active" href="/top.html">Tops</a>
+            <span class="nav-chip">Eliminar desde aquí</span>
+        </nav>
+    </header>
 
-    <div id="lista"></div>
+    <main class="main-stack">
+        <section class="hero-card">
+            <span class="eyebrow">Tus rankings</span>
+            <div class="hero-content">
+                <div>
+                    <h1 class="hero-title">Revisa tus mejores películas de un vistazo.</h1>
+                    <p class="hero-description">
+                        Consulta el top general o filtra por año. Si una valoración se creó por error,
+                        aquí mismo puedes eliminarla de forma directa.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Ranking</h2>
+                    <p id="topMeta">Cargando resultados...</p>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div>
+                    <label class="field-label" for="year">Año (opcional)</label>
+                    <input id="year" type="number" min="1900" max="2100" placeholder="Ej: 2024">
+                </div>
+                <button class="primary-button icon-button" type="button" onclick="cargarTops()">
+                    <span class="button-icon" aria-hidden="true">↻</span>
+                    <span>Actualizar</span>
+                </button>
+            </div>
+
+            <div id="msg" class="feedback hidden spacer-top"></div>
+            <div id="lista" class="top-list spacer-top"></div>
+        </section>
+    </main>
 </div>
 
 <script>
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function setMessage(text, type) {
+    const box = document.getElementById('msg');
+    box.textContent = text;
+    box.className = 'feedback ' + type + ' spacer-top';
+}
+
+function posterUrl(path) {
+    return path ? 'https://image.tmdb.org/t/p/w500' + path : '';
+}
+
+function ratingStars(score) {
+    const safeScore = Number(score || 0);
+    const filled = Math.max(0, Math.min(5, Math.round(safeScore / 2)));
+    return `
+        <span class="stars" aria-hidden="true">${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}</span>
+        <span>${safeScore}</span>
+    `;
+}
+
+function renderListCard(movie, index) {
+    const poster = posterUrl(movie.posterPath);
+    return `
+        <article class="top-card list-poster-card">
+            <div class="top-poster poster-frame">
+                ${poster
+                    ? `<img src="${poster}" alt="Póster de ${escapeHtml(movie.title)}">`
+                    : `<div class="poster-fallback">${escapeHtml((movie.title || '?').charAt(0).toUpperCase())}</div>`}
+            </div>
+            <div>
+                <div class="tag-row">
+                    <span class="tag">#${index + 1}</span>
+                    <span class="tag">${movie.releaseYear || 'Año desconocido'}</span>
+                </div>
+                <h3 class="top-title">${escapeHtml(movie.title)}</h3>
+                <p class="rating-inline compact-stars">${ratingStars(movie.averageScore)}</p>
+            </div>
+            <div class="top-actions">
+                <button class="danger-button small icon-button" type="button" onclick="eliminarValoracion(${movie.tmdbId}, '${encodeURIComponent(String(movie.title))}')">
+                    <span class="button-icon" aria-hidden="true">🗑</span>
+                    <span>Eliminar</span>
+                </button>
+            </div>
+        </article>
+    `;
+}
+
 async function cargarTops() {
     const year = document.getElementById('year').value;
+    const meta = document.getElementById('topMeta');
+    const list = document.getElementById('lista');
 
     let url = '/api/tops';
     if (year) url += '?year=' + year;
 
-    const res = await fetch(url);
-    const tops = await res.json();
+    meta.textContent = year ? 'Cargando top del año ' + year + '...' : 'Cargando top completo...';
 
-    let html = '';
-    if (tops.length === 0) {
-        html = '<p>Sin resultados</p>';
-    } else {
-        html = '<ol>';
-        for (let m of tops) {
-            html += `
-                <li>
-                    <div>
-                        ${m.title} (${m.releaseYear || '-'}) - Media: ${m.averageScore}
-                        <button class="danger-button small" onclick="eliminarValoracion(${m.tmdbId})">Eliminar item</button>
-                    </div>
-                </li>
-            `;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) {
+            list.innerHTML = '<div class="empty-state">No se pudieron cargar los tops.</div>';
+            meta.textContent = 'Error al cargar.';
+            return;
         }
-        html += '</ol>';
+
+        const tops = await res.json();
+
+        if (!Array.isArray(tops) || tops.length === 0) {
+            list.innerHTML = '<div class="empty-state">Todavía no hay películas valoradas para este filtro.</div>';
+            meta.textContent = year ? 'Sin resultados para ' + year + '.' : 'Sin resultados.';
+        } else {
+            meta.textContent = tops.length + ' película' + (tops.length === 1 ? '' : 's') + (year ? ' en ' + year : ' en total');
+            list.innerHTML = tops.map((m, index) => renderListCard(m, index)).join('');
+        }
+    } catch (_) {
+        list.innerHTML = '<div class="empty-state">Se perdió la conexión al cargar el ranking.</div>';
+        meta.textContent = 'Error de red.';
     }
-    document.getElementById('lista').innerHTML = html;
 }
 
-async function eliminarValoracion(tmdbId) {
-    const confirmacion = window.confirm('Esta seguro de eliminar esta valoracion?');
+async function eliminarValoracion(tmdbId, titleEncoded) {
+    const title = decodeURIComponent(titleEncoded);
+    const confirmacion = window.confirm('¿Eliminar la valoración de "' + title + '"?');
     if (!confirmacion) return;
 
-    const res = await fetch('/api/movie/' + tmdbId + '/rating', {
-        method: 'DELETE'
-    });
+    try {
+        const res = await fetch('/api/movie/' + tmdbId + '/rating', {
+            method: 'DELETE'
+        });
 
-    if (!res.ok) {
-        window.alert('No se pudo eliminar el item.');
-        return;
+        if (!res.ok) {
+            setMessage('No se pudo eliminar la valoración.', 'error');
+            return;
+        }
+
+        setMessage('Valoración eliminada correctamente.', 'success');
+        await cargarTops();
+    } catch (_) {
+        setMessage('Error de red al intentar eliminar.', 'error');
     }
-
-    await cargarTops();
 }
 
 cargarTops();

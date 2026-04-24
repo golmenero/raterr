@@ -40,6 +40,7 @@ data class TopMovieDto(
     val tmdbId: Int,
     val title: String,
     val releaseYear: Int?,
+    val posterPath: String?,
     val averageScore: Double,
     val ratingsCount: Int
 )
