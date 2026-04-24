@@ -9,18 +9,9 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
-        <a class="brand" href="/index.html">
-            <span class="brand-mark">R</span>
-            <span class="brand-copy">
-                <span class="brand-title">Raterr</span>
-                <span class="brand-subtitle">Ranking limpio de tus valoraciones</span>
-            </span>
-        </a>
-
         <nav class="site-nav" aria-label="Navegación principal">
             <a class="nav-link" href="/index.html">Buscar</a>
             <a class="nav-link active" href="/top.html">Tops</a>
-            <span class="nav-chip">Eliminar desde aquí</span>
         </nav>
     </header>
 
@@ -44,17 +35,13 @@
                     <h2>Ranking</h2>
                     <p id="topMeta">Cargando resultados...</p>
                 </div>
-            </div>
 
-            <div class="filter-row">
-                <div>
-                    <label class="field-label" for="year">Año (opcional)</label>
-                    <input id="year" type="number" min="1900" max="2100" placeholder="Ej: 2024">
+                <div class="heading-filter">
+                    <input id="year" type="number" min="1900" max="2100" placeholder="Año" aria-label="Filtrar por año">
+                    <button class="primary-button icon-button icon-only-button" type="button" onclick="cargarTops()" aria-label="Actualizar ranking">
+                        <span class="button-icon" aria-hidden="true">↻</span>
+                    </button>
                 </div>
-                <button class="primary-button icon-button" type="button" onclick="cargarTops()">
-                    <span class="button-icon" aria-hidden="true">↻</span>
-                    <span>Actualizar</span>
-                </button>
             </div>
 
             <div id="msg" class="feedback hidden spacer-top"></div>
@@ -94,15 +81,14 @@ function ratingStars(score) {
 
 function renderListCard(movie, index) {
     const poster = posterUrl(movie.posterPath);
+    const showPoster = index < 3 && Boolean(poster);
     return `
-        <article class="top-card list-poster-card">
-            <div class="top-poster poster-frame">
-                ${poster
-                    ? `<img src="${poster}" alt="Póster de ${escapeHtml(movie.title)}">`
-                    : `<div class="poster-fallback">${escapeHtml((movie.title || '?').charAt(0).toUpperCase())}</div>`}
-            </div>
-            <div>
-                <div class="tag-row">
+        <article class="top-card list-poster-card ${showPoster ? '' : 'no-poster'}">
+            ${showPoster
+                ? `<div class="top-poster poster-frame"><img src="${poster}" alt="Póster de ${escapeHtml(movie.title)}"></div>`
+                : ''}
+            <div class="top-info">
+                <div class="tag-row top-tag-row">
                     <span class="tag">#${index + 1}</span>
                     <span class="tag">${movie.releaseYear || 'Año desconocido'}</span>
                 </div>
@@ -110,9 +96,8 @@ function renderListCard(movie, index) {
                 <p class="rating-inline compact-stars">${ratingStars(movie.averageScore)}</p>
             </div>
             <div class="top-actions">
-                <button class="danger-button small icon-button" type="button" onclick="eliminarValoracion(${movie.tmdbId}, '${encodeURIComponent(String(movie.title))}')">
+                <button class="top-delete-button" type="button" onclick="eliminarValoracion(${movie.tmdbId}, '${encodeURIComponent(String(movie.title))}')" aria-label="Eliminar valoración">
                     <span class="button-icon" aria-hidden="true">🗑</span>
-                    <span>Eliminar</span>
                 </button>
             </div>
         </article>

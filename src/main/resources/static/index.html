@@ -9,18 +9,9 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
-        <a class="brand" href="/index.html">
-            <span class="brand-mark">R</span>
-            <span class="brand-copy">
-                <span class="brand-title">Raterr</span>
-                <span class="brand-subtitle">Busca, valora y ordena películas</span>
-            </span>
-        </a>
-
         <nav class="site-nav" aria-label="Navegación principal">
             <a class="nav-link active" href="/index.html">Buscar</a>
             <a class="nav-link" href="/top.html">Tops</a>
-            <span class="nav-chip">TMDB + rating propio</span>
         </nav>
     </header>
 
@@ -39,25 +30,18 @@
             </div>
         </section>
 
-        <section class="panel search-panel">
-            <div>
-                <label class="field-label" for="q">Buscar película</label>
-                <p class="helper-text">Escribe un título y pulsa Buscar o Enter para cargar los resultados.</p>
-            </div>
-
-            <div class="search-row">
-                <div class="search-box">
-                    <input id="q" type="text" placeholder="Ej: Inception, Interstellar, Dune..." autocomplete="off">
-                </div>
-                <button class="primary-button" type="button" onclick="buscar()">Buscar</button>
-            </div>
-        </section>
-
         <section class="panel">
             <div class="section-heading">
                 <div>
                     <h2>Resultados</h2>
                     <p id="resultadoMeta">Todavía no has hecho una búsqueda.</p>
+                </div>
+
+                <div class="heading-filter search-inline">
+                    <input id="q" type="text" placeholder="Buscar película" autocomplete="off" aria-label="Buscar película">
+                    <button class="primary-button icon-button icon-only-button" type="button" onclick="buscar()" aria-label="Buscar" title="Buscar">
+                        <span class="button-icon" aria-hidden="true">🔍</span>
+                    </button>
                 </div>
             </div>
             <div id="resultado" class="results-grid">
