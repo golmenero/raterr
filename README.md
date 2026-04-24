@@ -78,7 +78,7 @@ La base SQLite queda persistida en el volumen Docker `raterr_data`.
 - `GET /api/movie/{id}`
 - `POST /api/rate`
 - `DELETE /api/movie/{id}/rating`
-- `GET /api/tops?limit=10&year=2024`
+- `GET /api/tops?year=2024` (sin `limit` devuelve todos)
 
 Ejemplo payload para `POST /api/ratings`:
 ```json

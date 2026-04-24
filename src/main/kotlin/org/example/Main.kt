@@ -113,7 +113,7 @@ fun Application.raterrModule(config: AppConfig = AppConfig.fromEnv()) {
         }
 
         get("/api/tops") {
-            val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
+            val limit = call.request.queryParameters["limit"]?.toIntOrNull()
             val year = call.request.queryParameters["year"]?.toIntOrNull()
             try {
                 val tops = topService.getTop(limit, year)

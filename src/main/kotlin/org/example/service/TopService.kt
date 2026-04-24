@@ -10,8 +10,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class TopService {
 
-    fun getTop(limit: Int, year: Int?): List<TopMovieDto> {
-        val safeLimit = limit.coerceIn(1, 100)
+    fun getTop(limit: Int?, year: Int?): List<TopMovieDto> {
+        val safeLimit = limit?.coerceIn(1, 100)
 
         return transaction {
             val query = (Movies leftJoin Ratings).selectAll()
@@ -49,7 +49,7 @@ class TopService {
                 }
             }
 
-            grouped.values
+            val sorted = grouped.values
                 .filter { it.count > 0 }
                 .map {
                     TopMovieDto(
@@ -61,7 +61,8 @@ class TopService {
                     )
                 }
                 .sortedByDescending { it.averageScore }
-                .take(safeLimit)
+
+            if (safeLimit != null) sorted.take(safeLimit) else sorted
         }
     }
 

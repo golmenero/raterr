@@ -15,7 +15,6 @@
 <div class="container">
     <h2>Tops</h2>
     <label>Año (opcional): <input id="year" type="number" min="1900" max="2100"></label>
-    <label>Límite: <input id="limit" type="number" value="10" min="1" max="100"></label>
     <button onclick="cargarTops()">Cargar</button>
 
     <div id="lista"></div>
@@ -24,10 +23,9 @@
 <script>
 async function cargarTops() {
     const year = document.getElementById('year').value;
-    const limit = document.getElementById('limit').value || 10;
 
-    let url = '/api/tops?limit=' + limit;
-    if (year) url += '&year=' + year;
+    let url = '/api/tops';
+    if (year) url += '?year=' + year;
 
     const res = await fetch(url);
     const tops = await res.json();
