@@ -9,6 +9,7 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
+        <span class="nav-monogram" aria-hidden="true">R</span>
         <nav class="site-nav" aria-label="Navegación principal">
             <a class="nav-link" href="/index.html">Buscar</a>
             <a class="nav-link active" href="/top.html">Tops</a>
@@ -17,14 +18,9 @@
 
     <main class="main-stack">
         <section class="hero-card">
-            <span class="eyebrow">Tus rankings</span>
             <div class="hero-content">
                 <div>
                     <h1 class="hero-title">Revisa tus mejores películas de un vistazo.</h1>
-                    <p class="hero-description">
-                        Consulta el top general o filtra por año. Si una valoración se creó por error,
-                        aquí mismo puedes eliminarla de forma directa.
-                    </p>
                 </div>
             </div>
         </section>
@@ -33,7 +29,6 @@
             <div class="section-heading">
                 <div>
                     <h2>Ranking</h2>
-                    <p id="topMeta">Cargando resultados...</p>
                 </div>
 
                 <div class="heading-filter">
@@ -106,19 +101,15 @@ function renderListCard(movie, index) {
 
 async function cargarTops() {
     const year = document.getElementById('year').value;
-    const meta = document.getElementById('topMeta');
     const list = document.getElementById('lista');
 
     let url = '/api/tops';
     if (year) url += '?year=' + year;
 
-    meta.textContent = year ? 'Cargando top del año ' + year + '...' : 'Cargando top completo...';
-
     try {
         const res = await fetch(url);
         if (!res.ok) {
             list.innerHTML = '<div class="empty-state">No se pudieron cargar los tops.</div>';
-            meta.textContent = 'Error al cargar.';
             return;
         }
 
@@ -126,14 +117,11 @@ async function cargarTops() {
 
         if (!Array.isArray(tops) || tops.length === 0) {
             list.innerHTML = '<div class="empty-state">Todavía no hay películas valoradas para este filtro.</div>';
-            meta.textContent = year ? 'Sin resultados para ' + year + '.' : 'Sin resultados.';
         } else {
-            meta.textContent = tops.length + ' película' + (tops.length === 1 ? '' : 's') + (year ? ' en ' + year : ' en total');
             list.innerHTML = tops.map((m, index) => renderListCard(m, index)).join('');
         }
     } catch (_) {
         list.innerHTML = '<div class="empty-state">Se perdió la conexión al cargar el ranking.</div>';
-        meta.textContent = 'Error de red.';
     }
 }
 

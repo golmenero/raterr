@@ -19,6 +19,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
 class RatingService(private val tmdbClient: TmdbClient) {
+    private val maxSearchResults = 16
 
     suspend fun searchSuggestions(query: String, limit: Int = 5): List<MovieSuggestionDto> {
         if (query.isBlank()) return emptyList()
@@ -38,7 +39,7 @@ class RatingService(private val tmdbClient: TmdbClient) {
     }
 
     suspend fun searchAndCacheMovies(query: String): List<MovieDto> {
-        val tmdbMovies = tmdbClient.searchMovies(query)
+        val tmdbMovies = tmdbClient.searchMovies(query).take(maxSearchResults)
         return tmdbMovies.map { tmdbMovie ->
             val movieRow = upsertMovie(tmdbMovie)
             buildMovieDto(movieRow)
