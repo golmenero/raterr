@@ -45,7 +45,8 @@ html {
 
 body {
     min-height: 100vh;
-    font-family: var(--font-serif);
+    /* Base UI/body text uses sans; title classes keep serif explicitly */
+    font-family: var(--font-ui);
     color: var(--text);
     background:
         radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 28%),
