@@ -92,3 +92,15 @@ Ejemplo payload para `POST /api/ratings`:
 }
 ```
 
+## Dockge en TrueNAS SCALE (ligero)
+Archivos listos para usar:
+- `deploy/dockge/compose.yaml` (recomendado: imagen publicada)
+- `deploy/dockge/compose.build.yaml` (alternativa: build en NAS)
+- `deploy/dockge/.env.example` (variables del stack)
+- `docs/DEPLOY_DOCKGE.md` (pasos rapidos)
+
+Flujo minimo:
+1. Copia `deploy/dockge/.env.example` a `.env` en tu stack Dockge.
+2. Ajusta `TMDB_API_KEY` y `RATERR_DATA_DIR` (ruta `/mnt/<pool>/...`).
+3. Despliega con uno de los `compose` anteriores.
+4. Verifica en `http://IP_TRUENAS:8080/api/health`.
