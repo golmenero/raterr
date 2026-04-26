@@ -296,8 +296,8 @@ input {
 }
 
 .heading-filter input {
-    width: 120px;
-    min-width: 120px;
+    width: 180px;
+    min-width: 180px;
 }
 
 .search-inline input {
@@ -315,10 +315,12 @@ input {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 75%;
+    max-width: 900px;
 }
 
 .search-toolbar-centered .search-inline input {
-    width: min(460px, 70vw);
+    width: 100%;
     min-width: 0;
 }
 
@@ -970,6 +972,11 @@ input[type="range"] {
     .search-inline input {
         width: 100%;
         min-width: 0;
+    }
+
+    .heading-filter input {
+        width: 140px;
+        min-width: 140px;
     }
 
     .search-toolbar-centered {
