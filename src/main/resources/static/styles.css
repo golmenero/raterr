@@ -551,10 +551,25 @@ button:disabled {
     gap: 14px;
 }
 
+.result-card-disabled {
+    cursor: default;
+}
+
 .tag-row {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+}
+
+.result-meta-row {
+    align-items: center;
+    justify-content: space-between;
+}
+
+.result-rating-inline {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
 }
 
 .tag {

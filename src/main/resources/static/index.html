@@ -64,6 +64,12 @@ function getInitials(title) {
     return (title || '?').trim().charAt(0).toUpperCase();
 }
 
+function ratingStars(score) {
+    const safeScore = Number(score || 0);
+    const filled = Math.max(0, Math.min(5, Math.round(safeScore / 2)));
+    return `<span class="stars" aria-hidden="true">${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}</span>`;
+}
+
 function renderResultados(movies) {
     const container = document.getElementById('resultado');
 
@@ -77,24 +83,33 @@ function renderResultados(movies) {
         const overview = m.overview && m.overview.trim().length > 0
             ? escapeHtml(m.overview)
             : 'Sin sinopsis disponible por ahora.';
+        const isRated = (m.ratingsCount || 0) > 0;
+
+        const cardContent = `
+            <article class="result-card ${isRated ? 'result-card-disabled' : ''}">
+                <div class="poster-frame">
+                    ${poster
+                        ? `<img src="${poster}" alt="Póster de ${escapeHtml(m.title)}">`
+                        : `<div class="poster-fallback">${escapeHtml(getInitials(m.title))}</div>`}
+                </div>
+                <div class="result-content">
+                    <div class="tag-row result-meta-row">
+                        <span class="tag">${m.releaseYear || 'Año desconocido'}</span>
+                        ${isRated ? `<span class="result-rating-inline">${ratingStars(m.averageScore)}</span>` : ''}
+                    </div>
+                    <h3 class="result-title">${escapeHtml(m.title)}</h3>
+                    <p class="result-overview">${overview}</p>
+                </div>
+            </article>
+        `;
+
+        if (isRated) {
+            return cardContent;
+        }
 
         return `
             <a class="result-card-link" href="/rate.html?id=${m.tmdbId}" aria-label="Valorar ${escapeHtml(m.title)}">
-                <article class="result-card">
-                    <div class="poster-frame">
-                        ${poster
-                            ? `<img src="${poster}" alt="Póster de ${escapeHtml(m.title)}">`
-                            : `<div class="poster-fallback">${escapeHtml(getInitials(m.title))}</div>`}
-                    </div>
-                    <div class="result-content">
-                        <div class="tag-row">
-                            <span class="tag">${m.releaseYear || 'Año desconocido'}</span>
-                            <span class="tag">Media ${m.averageScore || 0}</span>
-                        </div>
-                        <h3 class="result-title">${escapeHtml(m.title)}</h3>
-                        <p class="result-overview">${overview}</p>
-                    </div>
-                </article>
+                ${cardContent}
             </a>
         `;
     }).join('');
