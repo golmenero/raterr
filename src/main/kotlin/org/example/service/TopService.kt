@@ -41,6 +41,11 @@ class TopService {
                             row[Ratings.guion]
                         ) / 5.0
                     acc.scoreSum += perRatingScore
+                    acc.direccionSum += row[Ratings.direccion]
+                    acc.fotografiaSum += row[Ratings.fotografia]
+                    acc.actuacionSum += row[Ratings.actuacion]
+                    acc.bandaSonoraSum += row[Ratings.bandaSonora]
+                    acc.guionSum += row[Ratings.guion]
                     acc.count += 1
                 } catch (_: Exception) {
                     // row viene de left join, si no hay rating esta fila es null
@@ -55,8 +60,13 @@ class TopService {
                         title = it.title,
                         releaseYear = it.releaseYear,
                         posterPath = it.posterPath,
-                        averageScore = round2(it.scoreSum / it.count),
-                        ratingsCount = it.count
+                        averageScore = it.scoreSum / it.count,
+                        ratingsCount = it.count,
+                        direccion = it.direccionSum / it.count,
+                        fotografia = it.fotografiaSum / it.count,
+                        actuacion = it.actuacionSum / it.count,
+                        bandaSonora = it.bandaSonoraSum / it.count,
+                        guion = it.guionSum / it.count
                     )
                 }
                 .sortedByDescending { it.averageScore }
@@ -64,9 +74,6 @@ class TopService {
             if (safeLimit != null) sorted.take(safeLimit) else sorted
         }
     }
-
-
-    private fun round2(value: Double): Double = kotlin.math.round(value * 100.0) / 100.0
 }
 
 private data class TopAccumulator(
@@ -76,6 +83,10 @@ private data class TopAccumulator(
     val posterPath: String?
 ) {
     var scoreSum: Double = 0.0
+    var direccionSum: Double = 0.0
+    var fotografiaSum: Double = 0.0
+    var actuacionSum: Double = 0.0
+    var bandaSonoraSum: Double = 0.0
+    var guionSum: Double = 0.0
     var count: Int = 0
 }
-

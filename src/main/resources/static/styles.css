@@ -71,30 +71,30 @@ input {
 }
 
 .site-header {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
+    justify-content: center;
+    gap: 28px;
+    padding: 0;
     margin-bottom: 22px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: rgba(29, 25, 23, 0.76);
-    backdrop-filter: blur(18px);
-    box-shadow: var(--shadow-soft);
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
     position: sticky;
     top: 16px;
     z-index: 40;
 }
 
 .nav-monogram {
-    justify-self: start;
     color: var(--accent);
     font-family: var(--font-serif);
     font-size: 1.7rem;
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .brand {
@@ -136,28 +136,35 @@ input {
     font-family: var(--font-ui);
 }
 
-.site-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    grid-column: 2;
-}
 
 .nav-link {
-    padding: 10px 14px;
-    border-radius: 999px;
+    padding: 12px 24px;
+    border-radius: 0;
+    border: 1px solid var(--accent);
+    border-left: none;
+    border-right: none;
     text-decoration: none;
     color: var(--text-soft);
     font-weight: 600;
     transition: 0.2s ease;
     font-family: var(--font-ui);
+    background: transparent;
+}
+
+.nav-link:first-of-type {
+    border-right: 1px solid var(--accent);
+}
+
+.nav-link:last-of-type {
+    border-left: 1px solid var(--accent);
 }
 
 .nav-link:hover,
 .nav-link.active {
-    background: rgba(255, 255, 255, 0.06);
-    color: #fff9f3;
+    background: transparent;
+    color: var(--text);
+    border-color: var(--accent);
+    font-weight: 600;
 }
 
 .nav-chip {
@@ -298,6 +305,23 @@ input {
     min-width: 280px;
 }
 
+.search-toolbar-centered {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 18px;
+}
+
+.search-toolbar-centered .search-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-toolbar-centered .search-inline input {
+    width: min(460px, 70vw);
+    min-width: 0;
+}
+
 .icon-only-button {
     width: 46px;
     height: 46px;
@@ -406,6 +430,16 @@ button {
     justify-content: center;
     font-size: 0.95rem;
     line-height: 1;
+}
+
+.button-icon-svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .primary-button:hover,
@@ -642,6 +676,41 @@ button:disabled {
     font-family: var(--font-ui);
 }
 
+.movie-inline-bar {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    backdrop-filter: blur(14px);
+}
+
+.movie-inline-poster {
+    flex-shrink: 0;
+    width: 60px;
+    height: 90px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.movie-inline-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.movie-inline-overview {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .score-panel {
     display: grid;
     gap: 18px;
@@ -649,7 +718,7 @@ button:disabled {
 
 .scores-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
 }
 
@@ -668,6 +737,17 @@ button:disabled {
     gap: 12px;
     font-weight: 700;
     font-family: var(--font-ui);
+}
+
+.score-label > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.score-icon {
+    font-size: 1rem;
+    line-height: 1;
 }
 
 .score-value {
@@ -772,6 +852,7 @@ input[type="range"] {
     margin-top: 8px;
 }
 
+
 .top-actions {
     display: flex;
     align-self: end;
@@ -859,13 +940,8 @@ input[type="range"] {
 
     .site-header {
         align-items: center;
-        border-radius: 28px;
-        grid-template-columns: 1fr auto 1fr;
-    }
-
-    .site-nav {
-        justify-content: center;
-        flex-wrap: wrap;
+        border-radius: 0;
+        gap: 20px;
     }
 
     .hero-card {
@@ -896,6 +972,14 @@ input[type="range"] {
         min-width: 0;
     }
 
+    .search-toolbar-centered {
+        justify-content: stretch;
+    }
+
+    .search-toolbar-centered .search-inline {
+        width: 100%;
+    }
+
     .top-card {
         grid-template-columns: 82px minmax(0, 1fr);
     }
@@ -919,6 +1003,10 @@ input[type="range"] {
     }
 
     .movie-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scores-grid {
         grid-template-columns: 1fr;
     }
 }

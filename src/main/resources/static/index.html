@@ -9,11 +9,9 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
+        <a class="nav-link active" href="/index.html">Buscar</a>
         <span class="nav-monogram" aria-hidden="true">R</span>
-        <nav class="site-nav" aria-label="Navegación principal">
-            <a class="nav-link active" href="/index.html">Buscar</a>
-            <a class="nav-link" href="/top.html">Tops</a>
-        </nav>
+        <a class="nav-link" href="/top.html">Tops</a>
     </header>
 
     <main class="main-stack">
@@ -27,21 +25,20 @@
         </section>
 
         <section class="panel">
-            <div class="section-heading">
-                <div>
-                    <h2>Resultados</h2>
-                </div>
-
+            <div class="search-toolbar-centered">
                 <div class="heading-filter search-inline">
                     <input id="q" type="text" placeholder="Buscar película" autocomplete="off" aria-label="Buscar película">
                     <button class="primary-button icon-button icon-only-button" type="button" onclick="buscar()" aria-label="Buscar" title="Buscar">
-                        <span class="button-icon" aria-hidden="true">🔍</span>
+                        <span class="button-icon" aria-hidden="true">
+                            <svg class="button-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <circle cx="11" cy="11" r="6.5"></circle>
+                                <line x1="16" y1="16" x2="21" y2="21"></line>
+                            </svg>
+                        </span>
                     </button>
                 </div>
             </div>
-            <div id="resultado" class="results-grid">
-                <div class="empty-state">Empieza escribiendo el nombre de una película para ver resultados aquí.</div>
-            </div>
+            <div id="resultado" class="results-grid"></div>
         </section>
     </main>
 </div>

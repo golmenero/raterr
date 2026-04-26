@@ -9,11 +9,9 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
+        <a class="nav-link" href="/index.html">Buscar</a>
         <span class="nav-monogram" aria-hidden="true">R</span>
-        <nav class="site-nav" aria-label="Navegación principal">
-            <a class="nav-link" href="/index.html">Buscar</a>
-            <a class="nav-link active" href="/top.html">Tops</a>
-        </nav>
+        <a class="nav-link active" href="/top.html">Tops</a>
     </header>
 
     <main class="main-stack">
@@ -70,9 +68,10 @@ function ratingStars(score) {
     const filled = Math.max(0, Math.min(5, Math.round(safeScore / 2)));
     return `
         <span class="stars" aria-hidden="true">${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}</span>
-        <span>${safeScore}</span>
+        <span>${safeScore.toFixed(2)}</span>
     `;
 }
+
 
 function renderListCard(movie, index) {
     const poster = posterUrl(movie.posterPath);

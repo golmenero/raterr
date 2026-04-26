@@ -22,11 +22,11 @@ data class MovieSuggestionDto(
 
 data class RatingRequest(
     val tmdbId: Int,
-    val direccion: Int,
-    val fotografia: Int,
-    val actuacion: Int,
-    val bandaSonora: Int,
-    val guion: Int
+    val direccion: Double,
+    val fotografia: Double,
+    val actuacion: Double,
+    val bandaSonora: Double,
+    val guion: Double
 )
 
 data class RatingResult(
@@ -42,6 +42,11 @@ data class TopMovieDto(
     val releaseYear: Int?,
     val posterPath: String?,
     val averageScore: Double,
-    val ratingsCount: Int
+    val ratingsCount: Int,
+    val direccion: Double = 0.0,
+    val fotografia: Double = 0.0,
+    val actuacion: Double = 0.0,
+    val bandaSonora: Double = 0.0,
+    val guion: Double = 0.0
 )
 

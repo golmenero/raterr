@@ -15,11 +15,11 @@ object Movies : IntIdTable("movie") {
 
 object Ratings : IntIdTable("rating") {
     val movieId = reference("movie_id", Movies)
-    val direccion = integer("direccion")
-    val fotografia = integer("fotografia")
-    val actuacion = integer("actuacion")
-    val bandaSonora = integer("banda_sonora")
-    val guion = integer("guion")
+    val direccion = double("direccion")
+    val fotografia = double("fotografia")
+    val actuacion = double("actuacion")
+    val bandaSonora = double("banda_sonora")
+    val guion = double("guion")
     val createdAtEpochMs = long("created_at_epoch_ms")
 }
 

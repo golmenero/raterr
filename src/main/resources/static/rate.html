@@ -9,86 +9,69 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
+        <a class="nav-link" href="/index.html">Buscar</a>
         <span class="nav-monogram" aria-hidden="true">R</span>
-        <nav class="site-nav" aria-label="Navegación principal">
-            <a class="nav-link" href="/index.html">Buscar</a>
-            <a class="nav-link" href="/top.html">Tops</a>
-        </nav>
+        <a class="nav-link" href="/top.html">Tops</a>
     </header>
 
     <main class="main-stack">
         <section class="hero-card">
-            <span class="eyebrow">Tu valoración</span>
             <div class="hero-content">
                 <div>
                     <h1 class="hero-title" id="title">Cargando película...</h1>
-                    <p class="hero-description" id="meta">En unos segundos podrás asignar tu valoración.</p>
-                </div>
-                <div class="hero-meta">
-                    <div class="meta-card">
-                        <div class="meta-label">Regla del sistema</div>
-                        <div class="meta-value">Solo se admite una valoración por película. Si te equivocas, la eliminas desde Tops.</div>
-                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="movie-layout">
-            <article class="movie-summary" id="movieSummary">
-                <div class="poster-frame">
-                    <div class="poster-fallback">?</div>
+        <article class="movie-inline-bar" id="movieSummary">
+            <div class="poster-frame movie-inline-poster">
+                <div class="poster-fallback">?</div>
+            </div>
+            <div class="movie-inline-body">
+                <div class="tag-row" id="movieTags">
+                    <span class="tag">Cargando...</span>
                 </div>
-                <div class="movie-summary-body">
-                    <h2 class="movie-title">Esperando datos...</h2>
-                    <p class="muted">Cargando información de la película.</p>
-                </div>
-            </article>
+                <p class="movie-inline-overview muted" id="movieOverview">Cargando información de la película.</p>
+            </div>
+        </article>
 
-            <section class="panel score-panel">
-                <div class="section-heading">
-                    <div>
-                        <h2>Tu criterio</h2>
-                        <p>Arrastra cada control entre 1 y 10 para construir una valoración rápida y clara.</p>
-                    </div>
-                </div>
+        <section class="panel score-panel">
 
-                <div class="scores-grid">
-                    <div class="score-field">
-                        <label class="score-label" for="dir"><span>Dirección</span><span class="score-value" id="dirValue">8</span></label>
-                        <input id="dir" type="range" min="1" max="10" value="8">
-                        <div class="range-meta"><span>1</span><span>10</span></div>
-                    </div>
-
-                    <div class="score-field">
-                        <label class="score-label" for="foto"><span>Fotografía</span><span class="score-value" id="fotoValue">8</span></label>
-                        <input id="foto" type="range" min="1" max="10" value="8">
-                        <div class="range-meta"><span>1</span><span>10</span></div>
-                    </div>
-
-                    <div class="score-field">
-                        <label class="score-label" for="act"><span>Actuación</span><span class="score-value" id="actValue">8</span></label>
-                        <input id="act" type="range" min="1" max="10" value="8">
-                        <div class="range-meta"><span>1</span><span>10</span></div>
-                    </div>
-
-                    <div class="score-field">
-                        <label class="score-label" for="banda"><span>Banda sonora</span><span class="score-value" id="bandaValue">8</span></label>
-                        <input id="banda" type="range" min="1" max="10" value="8">
-                        <div class="range-meta"><span>1</span><span>10</span></div>
-                    </div>
-
-                    <div class="score-field">
-                        <label class="score-label" for="guion"><span>Guión</span><span class="score-value" id="guionValue">8</span></label>
-                        <input id="guion" type="range" min="1" max="10" value="8">
-                        <div class="range-meta"><span>1</span><span>10</span></div>
-                    </div>
+            <div class="scores-grid">
+                <div class="score-field">
+                    <label class="score-label" for="dir"><span><span class="score-icon" aria-hidden="true">🎬</span>Dirección</span><span class="score-value" id="dirValue">5.00</span></label>
+                    <input id="dir" type="range" min="1" max="10" step="0.25" value="5">
+                    <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
 
-                <div class="top-actions">
-                    <button id="btnGuardar" class="primary-button" type="button" onclick="guardar()">Guardar valoración</button>
-                    <a class="secondary-button" href="/top.html">Ir a Tops</a>
+                <div class="score-field">
+                    <label class="score-label" for="foto"><span><span class="score-icon" aria-hidden="true">📷</span>Fotografía</span><span class="score-value" id="fotoValue">5.00</span></label>
+                    <input id="foto" type="range" min="1" max="10" step="0.25" value="5">
+                    <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
-            </section>
+
+                <div class="score-field">
+                    <label class="score-label" for="act"><span><span class="score-icon" aria-hidden="true">🎭</span>Actuación</span><span class="score-value" id="actValue">5.00</span></label>
+                    <input id="act" type="range" min="1" max="10" step="0.25" value="5">
+                    <div class="range-meta"><span>1</span><span>10</span></div>
+                </div>
+
+                <div class="score-field">
+                    <label class="score-label" for="banda"><span><span class="score-icon" aria-hidden="true">🎵</span>Banda sonora</span><span class="score-value" id="bandaValue">5.00</span></label>
+                    <input id="banda" type="range" min="1" max="10" step="0.25" value="5">
+                    <div class="range-meta"><span>1</span><span>10</span></div>
+                </div>
+
+                <div class="score-field">
+                    <label class="score-label" for="guion"><span><span class="score-icon" aria-hidden="true">✍️</span>Guión</span><span class="score-value" id="guionValue">5.00</span></label>
+                    <input id="guion" type="range" min="1" max="10" step="0.25" value="5">
+                    <div class="range-meta"><span>1</span><span>10</span></div>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button id="btnGuardar" class="primary-button" type="button" onclick="guardar()">Guardar</button>
+            </div>
         </section>
 
         <div id="msg" class="feedback hidden"></div>
@@ -111,7 +94,7 @@ function escapeHtml(value) {
 }
 
 function posterUrl(path) {
-    return path ? 'https://image.tmdb.org/t/p/w500' + path : '';
+    return path ? 'https://image.tmdb.org/t/p/w185' + path : '';
 }
 
 function setMessage(text, type) {
@@ -123,7 +106,7 @@ function setMessage(text, type) {
 function updateSliderValue(inputId) {
     const input = document.getElementById(inputId);
     const value = document.getElementById(inputId + 'Value');
-    value.textContent = input.value;
+    value.textContent = parseFloat(input.value).toFixed(2);
 }
 
 function setInputsDisabled(disabled) {
@@ -141,28 +124,17 @@ function renderMovieSummary(movie) {
         : 'No hay sinopsis disponible para este título.';
 
     container.innerHTML = `
-        <div class="poster-frame">
+        <div class="poster-frame movie-inline-poster">
             ${poster
                 ? `<img src="${poster}" alt="Póster de ${escapeHtml(movie.title)}">`
                 : `<div class="poster-fallback">${escapeHtml((movie.title || '?').charAt(0).toUpperCase())}</div>`}
         </div>
-        <div class="movie-summary-body">
+        <div class="movie-inline-body">
             <div class="tag-row">
                 <span class="tag">${movie.releaseYear || 'Año desconocido'}</span>
-                <span class="tag">Media ${movie.averageScore || 0}</span>
+                <span class="tag">TMDB: ${movie.tmdbVoteAverage || '—'}</span>
             </div>
-            <h2 class="movie-title">${escapeHtml(movie.title)}</h2>
-            <div class="movie-meta-grid">
-                <div class="meta-block">
-                    <strong>Estreno</strong>
-                    <span>${movie.releaseDate || 'Sin fecha'}</span>
-                </div>
-                <div class="meta-block">
-                    <strong>TMDB</strong>
-                    <span>${movie.tmdbVoteAverage || 'Sin nota'}</span>
-                </div>
-            </div>
-            <p class="muted">${overview}</p>
+            <p class="movie-inline-overview muted">${overview}</p>
         </div>
     `;
 }
@@ -189,8 +161,7 @@ async function cargarPelicula() {
         }
 
         const m = await res.json();
-        document.getElementById('title').textContent = 'Valora ' + m.title;
-        document.getElementById('meta').textContent = 'Media actual: ' + (m.averageScore || 0);
+        document.getElementById('title').textContent = m.title;
         renderMovieSummary(m);
 
         if ((m.ratingsCount || 0) > 0) {
@@ -209,11 +180,11 @@ async function cargarPelicula() {
 async function guardar() {
     const payload = {
         tmdbId: parseInt(id),
-        direccion: parseInt(document.getElementById('dir').value),
-        fotografia: parseInt(document.getElementById('foto').value),
-        actuacion: parseInt(document.getElementById('act').value),
-        bandaSonora: parseInt(document.getElementById('banda').value),
-        guion: parseInt(document.getElementById('guion').value)
+        direccion: parseFloat(document.getElementById('dir').value),
+        fotografia: parseFloat(document.getElementById('foto').value),
+        actuacion: parseFloat(document.getElementById('act').value),
+        bandaSonora: parseFloat(document.getElementById('banda').value),
+        guion: parseFloat(document.getElementById('guion').value)
     };
 
     try {
@@ -225,9 +196,9 @@ async function guardar() {
 
         if (res.ok) {
             const data = await res.json();
-            setMessage('Valoración guardada. Nueva media: ' + data.averageScore, 'success');
-            document.getElementById('meta').textContent = 'Media actual: ' + (data.averageScore || 0);
+            setMessage('Valoración guardada. Nueva media: ' + data.averageScore.toFixed(2), 'success');
             setInputsDisabled(true);
+            window.location.href = '/top.html';
         } else if (res.status === 409) {
             const err = await res.json();
             setMessage(err.message || 'Ya existe una valoración para esta película.', 'info');

@@ -120,7 +120,7 @@ class RatingService(private val tmdbClient: TmdbClient) {
             "bandaSonora" to request.bandaSonora,
             "guion" to request.guion
         ).forEach { (field, value) ->
-            require(value in 1..10) { "El campo $field debe estar entre 1 y 10" }
+            require(value >= 1.0 && value <= 10.0) { "El campo $field debe estar entre 1 y 10" }
         }
     }
 
@@ -193,14 +193,11 @@ class RatingService(private val tmdbClient: TmdbClient) {
                 ) / 5.0
         }.average()
 
-        return ScoreStats(averageScore = round2(avg), ratingsCount = rows.size)
+        return ScoreStats(averageScore = avg, ratingsCount = rows.size)
     }
-
-    private fun round2(value: Double): Double = kotlin.math.round(value * 100.0) / 100.0
 }
 
 private data class ScoreStats(
     val averageScore: Double,
     val ratingsCount: Int
 )
-
