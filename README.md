@@ -104,3 +104,16 @@ Flujo minimo:
 2. Ajusta `TMDB_API_KEY` y `RATERR_DATA_DIR` (ruta `/mnt/<pool>/...`).
 3. Despliega con uno de los `compose` anteriores.
 4. Verifica en `http://IP_TRUENAS:8080/api/health`.
+
+### Publicar imagen en GHCR (tags)
+Al crear un tag `v*`, el workflow `release.yml` publica en GHCR:
+- `ghcr.io/<owner>/raterr:vX.Y.Z`
+- `ghcr.io/<owner>/raterr:latest`
+
+Comandos de ejemplo:
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+En TrueNAS/Dockge usa `RATERR_IMAGE=ghcr.io/<owner>/raterr:vX.Y.Z`.
