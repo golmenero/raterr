@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raterr - Valorar</title>
+    <title>Raterr - Rate</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <div class="page-shell">
     <header class="site-header">
-        <a class="nav-link" href="/index.html">Buscar</a>
+        <a class="nav-link" href="/index.html">Search</a>
         <span class="nav-monogram" aria-hidden="true">R</span>
         <a class="nav-link" href="/top.html">Tops</a>
     </header>
@@ -18,7 +18,7 @@
         <section class="hero-card">
             <div class="hero-content">
                 <div>
-                    <h1 class="hero-title" id="title">Cargando película...</h1>
+                    <h1 class="hero-title" id="title">Loading movie...</h1>
                 </div>
             </div>
         </section>
@@ -29,9 +29,9 @@
             </div>
             <div class="movie-inline-body">
                 <div class="tag-row" id="movieTags">
-                    <span class="tag">Cargando...</span>
+                    <span class="tag">Loading...</span>
                 </div>
-                <p class="movie-inline-overview muted" id="movieOverview">Cargando información de la película.</p>
+                <p class="movie-inline-overview muted" id="movieOverview">Loading movie information.</p>
             </div>
         </article>
 
@@ -39,38 +39,38 @@
 
             <div class="scores-grid">
                 <div class="score-field">
-                    <label class="score-label" for="dir"><span><span class="score-icon" aria-hidden="true">🎬</span>Dirección</span><span class="score-value" id="dirValue">5.00</span></label>
+                    <label class="score-label" for="dir"><span><span class="score-icon" aria-hidden="true">🎬</span>Direction</span><span class="score-value" id="dirValue">5.00</span></label>
                     <input id="dir" type="range" min="1" max="10" step="0.25" value="5">
                     <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
 
                 <div class="score-field">
-                    <label class="score-label" for="foto"><span><span class="score-icon" aria-hidden="true">📷</span>Fotografía</span><span class="score-value" id="fotoValue">5.00</span></label>
+                    <label class="score-label" for="foto"><span><span class="score-icon" aria-hidden="true">📷</span>Photography</span><span class="score-value" id="fotoValue">5.00</span></label>
                     <input id="foto" type="range" min="1" max="10" step="0.25" value="5">
                     <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
 
                 <div class="score-field">
-                    <label class="score-label" for="act"><span><span class="score-icon" aria-hidden="true">🎭</span>Actuación</span><span class="score-value" id="actValue">5.00</span></label>
+                    <label class="score-label" for="act"><span><span class="score-icon" aria-hidden="true">🎭</span>Acting</span><span class="score-value" id="actValue">5.00</span></label>
                     <input id="act" type="range" min="1" max="10" step="0.25" value="5">
                     <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
 
                 <div class="score-field">
-                    <label class="score-label" for="banda"><span><span class="score-icon" aria-hidden="true">🎵</span>Banda sonora</span><span class="score-value" id="bandaValue">5.00</span></label>
+                    <label class="score-label" for="banda"><span><span class="score-icon" aria-hidden="true">🎵</span>Soundtrack</span><span class="score-value" id="bandaValue">5.00</span></label>
                     <input id="banda" type="range" min="1" max="10" step="0.25" value="5">
                     <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
 
                 <div class="score-field">
-                    <label class="score-label" for="guion"><span><span class="score-icon" aria-hidden="true">✍️</span>Guión</span><span class="score-value" id="guionValue">5.00</span></label>
+                    <label class="score-label" for="guion"><span><span class="score-icon" aria-hidden="true">✍️</span>Script</span><span class="score-value" id="guionValue">5.00</span></label>
                     <input id="guion" type="range" min="1" max="10" step="0.25" value="5">
                     <div class="range-meta"><span>1</span><span>10</span></div>
                 </div>
             </div>
 
             <div class="top-actions">
-                <button id="btnGuardar" class="primary-button" type="button" onclick="guardar()">Guardar</button>
+                <button id="btnGuardar" class="primary-button" type="button" onclick="guardar()">Save</button>
             </div>
         </section>
 
@@ -121,17 +121,17 @@ function renderMovieSummary(movie) {
     const poster = posterUrl(movie.posterPath);
     const overview = movie.overview && movie.overview.trim().length > 0
         ? escapeHtml(movie.overview)
-        : 'No hay sinopsis disponible para este título.';
+        : 'No synopsis available for this title.';
 
     container.innerHTML = `
         <div class="poster-frame movie-inline-poster">
             ${poster
-                ? `<img src="${poster}" alt="Póster de ${escapeHtml(movie.title)}">`
+                ? `<img src="${poster}" alt="Poster of ${escapeHtml(movie.title)}">`
                 : `<div class="poster-fallback">${escapeHtml((movie.title || '?').charAt(0).toUpperCase())}</div>`}
         </div>
         <div class="movie-inline-body">
             <div class="tag-row">
-                <span class="tag">${movie.releaseYear || 'Año desconocido'}</span>
+                <span class="tag">${movie.releaseYear || 'Unknown year'}</span>
                 <span class="tag">TMDB: ${movie.tmdbVoteAverage || '—'}</span>
             </div>
             <p class="movie-inline-overview muted">${overview}</p>
@@ -145,7 +145,7 @@ sliderIds.forEach((inputId) => {
 });
 
 if (!id) {
-    setMessage('Falta ID de película.', 'error');
+    setMessage('Missing movie ID.', 'error');
     setInputsDisabled(true);
 } else {
     cargarPelicula();
@@ -155,7 +155,7 @@ async function cargarPelicula() {
     try {
         const res = await fetch('/api/movie/' + id);
         if (!res.ok) {
-            setMessage('No encontramos esa película.', 'error');
+            setMessage('We could not find that movie.', 'error');
             setInputsDisabled(true);
             return;
         }
@@ -166,13 +166,13 @@ async function cargarPelicula() {
 
         if ((m.ratingsCount || 0) > 0) {
             setInputsDisabled(true);
-            setMessage('Esta película ya tiene una valoración. Si quieres cambiarla, elimínala antes desde Tops.', 'info');
+            setMessage('This movie already has a rating. If you want to change it, delete it first from Tops.', 'info');
         } else {
             setInputsDisabled(false);
             document.getElementById('msg').className = 'feedback hidden';
         }
     } catch (_) {
-        setMessage('No se pudo cargar la película por un error de red.', 'error');
+        setMessage('Could not load the movie due to a network error.', 'error');
         setInputsDisabled(true);
     }
 }
@@ -196,18 +196,18 @@ async function guardar() {
 
         if (res.ok) {
             const data = await res.json();
-            setMessage('Valoración guardada. Nueva media: ' + data.averageScore.toFixed(2), 'success');
+            setMessage('Rating saved. New average: ' + data.averageScore.toFixed(2), 'success');
             setInputsDisabled(true);
             window.location.href = '/top.html';
         } else if (res.status === 409) {
             const err = await res.json();
-            setMessage(err.message || 'Ya existe una valoración para esta película.', 'info');
+            setMessage(err.message || 'A rating already exists for this movie.', 'info');
             setInputsDisabled(true);
         } else {
-            setMessage('No se pudo guardar la valoración.', 'error');
+            setMessage('Could not save the rating.', 'error');
         }
     } catch (_) {
-        setMessage('Se produjo un error de red al guardar.', 'error');
+        setMessage('A network error occurred while saving.', 'error');
     }
 }
 </script>

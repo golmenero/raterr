@@ -1,75 +1,75 @@
 # Raterr
 
-App web para buscar peliculas en TMDB, valorarlas por categorias y generar tops.
+Web app to search for movies on TMDB, rate them by categories, and generate top lists.
 
 ## Stack
 - Backend: Kotlin + Ktor
-- DB: SQLite (archivo local)
-- Frontend: HTML/CSS/JS puro
+- DB: SQLite (local file)
+- Frontend: Pure HTML/CSS/JS
 
-## Funcionalidades
-- Busqueda de peliculas en TMDB
-- Valoracion por categorias:
-  - Direccion
-  - Fotografia
-  - Actuacion
-  - Banda sonora
-  - Guion
-- Calculo de media por pelicula
-- Maximo una valoracion por pelicula (si te equivocas, se elimina desde Tops)
+## Features
+- Movie search on TMDB
+- Rating by categories:
+  - Direction
+  - Photography
+  - Acting
+  - Soundtrack
+  - Script
+- Average score calculation per movie
+- Maximum one rating per movie (if you make a mistake, it's deleted from Tops)
 - Tops:
   - General
-  - Por anio
+  - By year
 
-## Modelo de datos
-- Tabla `movie`: metadatos de TMDB
-- Tabla `rating`: valoraciones por categoria
+## Data Model
+- `movie` table: TMDB metadata
+- `rating` table: ratings per category
 
-## Variables de entorno
-- `TMDB_API_KEY` (obligatoria para consultar TMDB)
-- `PORT` (opcional, default `8080`)
-- `SQLITE_DB_PATH` (opcional, default `raterr.db`)
+## Environment Variables
+- `TMDB_API_KEY` (required to query TMDB)
+- `PORT` (optional, default `8080`)
+- `SQLITE_DB_PATH` (optional, default `raterr.db`)
 
-## Ejecutar
+## Run
 ```powershell
-$env:TMDB_API_KEY="TU_API_KEY"
+$env:TMDB_API_KEY="YOUR_API_KEY"
 mvn clean compile exec:java
 ```
 
-Abrir en navegador:
+Open in browser:
 - `http://localhost:8080/index.html`
 - `http://localhost:8080/top.html`
 
 ## Docker
 
-### Build de imagen
+### Build Image
 ```powershell
 docker build -t raterr .
 ```
 
-### Ejecutar contenedor
+### Run Container
 ```powershell
-docker run --name raterr -p 8080:8080 -e TMDB_API_KEY="TU_API_KEY" -e PORT="8080" -e SQLITE_DB_PATH="/data/raterr.db" -v raterr_data:/data raterr
+docker run --name raterr -p 8080:8080 -e TMDB_API_KEY="YOUR_API_KEY" -e PORT="8080" -e SQLITE_DB_PATH="/data/raterr.db" -v raterr_data:/data raterr
 ```
 
 ### Docker Compose
 ```powershell
-# opcion A: variable en la sesion
-$env:TMDB_API_KEY="TU_API_KEY"
+# Option A: variable in session
+$env:TMDB_API_KEY="YOUR_API_KEY"
 docker compose up --build
 ```
 
-Tambien puedes usar un archivo `.env` en la raiz del proyecto (puedes partir de `.env.example`):
+You can also use a `.env` file in the project root (you can start from `.env.example`):
 
 ```env
-TMDB_API_KEY=TU_API_KEY
+TMDB_API_KEY=YOUR_API_KEY
 PORT=8080
 SQLITE_DB_PATH=/data/raterr.db
 ```
 
-Compose inyecta estas variables en el contenedor en `docker-compose.yml`.
+Compose injects these variables into the container in `docker-compose.yml`.
 
-La base SQLite queda persistida en el volumen Docker `raterr_data`.
+The SQLite database is persisted in the Docker volume `raterr_data`.
 
 ## Endpoints
 - `GET /api/health`
@@ -78,9 +78,9 @@ La base SQLite queda persistida en el volumen Docker `raterr_data`.
 - `GET /api/movie/{id}`
 - `POST /api/rate`
 - `DELETE /api/movie/{id}/rating`
-- `GET /api/tops?year=2024` (sin `limit` devuelve todos)
+- `GET /api/tops?year=2024` (without `limit` returns all)
 
-Ejemplo payload para `POST /api/ratings`:
+Example payload for `POST /api/ratings`:
 ```json
 {
   "tmdbId": 603,
@@ -92,28 +92,28 @@ Ejemplo payload para `POST /api/ratings`:
 }
 ```
 
-## Dockge en TrueNAS SCALE (ligero)
-Archivos listos para usar:
-- `deploy/dockge/compose.yaml` (recomendado: imagen publicada)
-- `deploy/dockge/compose.build.yaml` (alternativa: build en NAS)
-- `deploy/dockge/.env.example` (variables del stack)
-- `docs/DEPLOY_DOCKGE.md` (pasos rapidos)
+## Dockge on TrueNAS SCALE (lightweight)
+Ready-to-use files:
+- `deploy/dockge/compose.yaml` (recommended: published image)
+- `deploy/dockge/compose.build.yaml` (alternative: build on NAS)
+- `deploy/dockge/.env.example` (stack variables)
+- `docs/DEPLOY_DOCKGE.md` (quick steps)
 
-Flujo minimo:
-1. Copia `deploy/dockge/.env.example` a `.env` en tu stack Dockge.
-2. Ajusta `TMDB_API_KEY` y `RATERR_DATA_DIR` (ruta `/mnt/<pool>/...`).
-3. Despliega con uno de los `compose` anteriores.
-4. Verifica en `http://IP_TRUENAS:8080/api/health`.
+Minimal flow:
+1. Copy `deploy/dockge/.env.example` to `.env` in your Dockge stack.
+2. Adjust `TMDB_API_KEY` and `RATERR_DATA_DIR` (path `/mnt/<pool>/...`).
+3. Deploy with one of the above `compose` files.
+4. Verify at `http://IP_TRUENAS:8080/api/health`.
 
-### Publicar imagen en GHCR (tags)
-Al crear un tag `v*`, el workflow `release.yml` publica en GHCR:
+### Publishing Image to GHCR (tags)
+When you create a tag `v*`, the `release.yml` workflow publishes to GHCR:
 - `ghcr.io/<owner>/raterr:vX.Y.Z`
 - `ghcr.io/<owner>/raterr:latest`
 
-Comandos de ejemplo:
+Example commands:
 ```powershell
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-En TrueNAS/Dockge usa `RATERR_IMAGE=ghcr.io/<owner>/raterr:vX.Y.Z`.
+On TrueNAS/Dockge use `RATERR_IMAGE=ghcr.io/<owner>/raterr:vX.Y.Z`.

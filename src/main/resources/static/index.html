@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raterr - Buscar</title>
+    <title>Raterr - Search</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 <div class="page-shell">
     <header class="site-header">
-        <a class="nav-link active" href="/index.html">Buscar</a>
+        <a class="nav-link active" href="/index.html">Search</a>
         <span class="nav-monogram" aria-hidden="true">R</span>
         <a class="nav-link" href="/top.html">Tops</a>
     </header>
@@ -19,7 +19,7 @@
 
             <div class="hero-content">
                 <div>
-                    <h1 class="hero-title">Encuentra una película y valórala en segundos.</h1>
+                    <h1 class="hero-title">Find a movie and rate it in seconds.</h1>
                 </div>
             </div>
         </section>
@@ -27,8 +27,8 @@
         <section class="panel">
             <div class="search-toolbar-centered">
                 <div class="heading-filter search-inline">
-                    <input id="q" type="text" placeholder="Buscar película" autocomplete="off" aria-label="Buscar película">
-                    <button class="primary-button icon-button icon-only-button" type="button" onclick="buscar()" aria-label="Buscar" title="Buscar">
+                    <input id="q" type="text" placeholder="Search movie" autocomplete="off" aria-label="Search movie">
+                    <button class="primary-button icon-button icon-only-button" type="button" onclick="buscar()" aria-label="Search" title="Search">
                         <span class="button-icon" aria-hidden="true">
                             <svg class="button-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <circle cx="11" cy="11" r="6.5"></circle>
@@ -71,7 +71,7 @@ function renderResultados(movies) {
     const container = document.getElementById('resultado');
 
     if (!Array.isArray(movies) || movies.length === 0) {
-        container.innerHTML = '<div class="empty-state">Prueba con otro título, año o nombre original.</div>';
+        container.innerHTML = '<div class="empty-state">Try with another title, year or original name.</div>';
         return;
     }
 
@@ -79,19 +79,19 @@ function renderResultados(movies) {
         const poster = posterUrl(m.posterPath);
         const overview = m.overview && m.overview.trim().length > 0
             ? escapeHtml(m.overview)
-            : 'Sin sinopsis disponible por ahora.';
+            : 'No synopsis available right now.';
         const isRated = (m.ratingsCount || 0) > 0;
 
         const cardContent = `
             <article class="result-card ${isRated ? 'result-card-disabled' : ''}">
                 <div class="poster-frame">
                     ${poster
-                        ? `<img src="${poster}" alt="Póster de ${escapeHtml(m.title)}">`
+                        ? `<img src="${poster}" alt="Poster of ${escapeHtml(m.title)}">`
                         : `<div class="poster-fallback">${escapeHtml(getInitials(m.title))}</div>`}
                 </div>
                 <div class="result-content">
                     <div class="tag-row result-meta-row">
-                        <span class="tag">${m.releaseYear || 'Año desconocido'}</span>
+                        <span class="tag">${m.releaseYear || 'Unknown year'}</span>
                         ${isRated ? `<span class="result-rating-inline">${ratingStars(m.averageScore)}</span>` : ''}
                     </div>
                     <h3 class="result-title">${escapeHtml(m.title)}</h3>
@@ -105,7 +105,7 @@ function renderResultados(movies) {
         }
 
         return `
-            <a class="result-card-link" href="/rate.html?id=${m.tmdbId}" aria-label="Valorar ${escapeHtml(m.title)}">
+            <a class="result-card-link" href="/rate.html?id=${m.tmdbId}" aria-label="Rate ${escapeHtml(m.title)}">
                 ${cardContent}
             </a>
         `;
@@ -119,14 +119,14 @@ async function buscar() {
     try {
         const res = await fetch('/api/search?q=' + encodeURIComponent(q));
         if (!res.ok) {
-            document.getElementById('resultado').innerHTML = '<div class="empty-state">No se pudo completar la búsqueda.</div>';
+            document.getElementById('resultado').innerHTML = '<div class="empty-state">Could not complete the search.</div>';
             return;
         }
 
         const movies = await res.json();
         renderResultados(movies);
     } catch (_) {
-        document.getElementById('resultado').innerHTML = '<div class="empty-state">Se perdió la conexión al buscar resultados.</div>';
+        document.getElementById('resultado').innerHTML = '<div class="empty-state">Connection lost while searching for results.</div>';
     }
 }
 

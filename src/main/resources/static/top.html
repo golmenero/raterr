@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,7 @@
 <body>
 <div class="page-shell">
     <header class="site-header">
-        <a class="nav-link" href="/index.html">Buscar</a>
+        <a class="nav-link" href="/index.html">Search</a>
         <span class="nav-monogram" aria-hidden="true">R</span>
         <a class="nav-link active" href="/top.html">Tops</a>
     </header>
@@ -18,7 +18,7 @@
         <section class="hero-card">
             <div class="hero-content">
                 <div>
-                    <h1 class="hero-title">Revisa tus mejores películas de un vistazo.</h1>
+                    <h1 class="hero-title">Review your best movies at a glance.</h1>
                 </div>
             </div>
         </section>
@@ -27,8 +27,8 @@
             <div class="section-heading">
 
                 <div class="heading-filter">
-                    <input id="year" type="number" min="1900" max="2100" placeholder="Año" aria-label="Filtrar por año">
-                    <button class="primary-button icon-button icon-only-button" type="button" onclick="cargarTops()" aria-label="Actualizar ranking">
+                    <input id="year" type="number" min="1900" max="2100" placeholder="Year" aria-label="Filter by year">
+                    <button class="primary-button icon-button icon-only-button" type="button" onclick="cargarTops()" aria-label="Refresh ranking">
                         <span class="button-icon" aria-hidden="true">↻</span>
                     </button>
                 </div>
@@ -76,18 +76,18 @@ function renderListCard(movie, index) {
     return `
         <article class="top-card list-poster-card ${showPoster ? '' : 'no-poster'}">
             ${showPoster
-                ? `<div class="top-poster poster-frame"><img src="${poster}" alt="Póster de ${escapeHtml(movie.title)}"></div>`
+                ? `<div class="top-poster poster-frame"><img src="${poster}" alt="Poster of ${escapeHtml(movie.title)}"></div>`
                 : ''}
             <div class="top-info">
                 <div class="tag-row top-tag-row">
                     <span class="tag">#${index + 1}</span>
-                    <span class="tag">${movie.releaseYear || 'Año desconocido'}</span>
+                    <span class="tag">${movie.releaseYear || 'Unknown year'}</span>
                 </div>
                 <h3 class="top-title">${escapeHtml(movie.title)}</h3>
                 <p class="rating-inline compact-stars">${ratingStars(movie.averageScore)}</p>
             </div>
             <div class="top-actions">
-                <button class="top-delete-button" type="button" onclick="eliminarValoracion(${movie.tmdbId}, '${encodeURIComponent(String(movie.title))}')" aria-label="Eliminar valoración">
+                <button class="top-delete-button" type="button" onclick="eliminarValoracion(${movie.tmdbId}, '${encodeURIComponent(String(movie.title))}')" aria-label="Delete rating">
                     <span class="button-icon" aria-hidden="true">🗑</span>
                 </button>
             </div>
@@ -105,25 +105,25 @@ async function cargarTops() {
     try {
         const res = await fetch(url);
         if (!res.ok) {
-            list.innerHTML = '<div class="empty-state">No se pudieron cargar los tops.</div>';
+            list.innerHTML = '<div class="empty-state">Could not load the tops.</div>';
             return;
         }
 
         const tops = await res.json();
 
         if (!Array.isArray(tops) || tops.length === 0) {
-            list.innerHTML = '<div class="empty-state">Todavía no hay películas valoradas para este filtro.</div>';
+            list.innerHTML = '<div class="empty-state">No rated movies yet for this filter.</div>';
         } else {
             list.innerHTML = tops.map((m, index) => renderListCard(m, index)).join('');
         }
     } catch (_) {
-        list.innerHTML = '<div class="empty-state">Se perdió la conexión al cargar el ranking.</div>';
+        list.innerHTML = '<div class="empty-state">Connection lost while loading the ranking.</div>';
     }
 }
 
 async function eliminarValoracion(tmdbId, titleEncoded) {
     const title = decodeURIComponent(titleEncoded);
-    const confirmacion = window.confirm('¿Eliminar la valoración de "' + title + '"?');
+    const confirmacion = window.confirm('Delete the rating for "' + title + '"?');
     if (!confirmacion) return;
 
     try {
@@ -132,14 +132,14 @@ async function eliminarValoracion(tmdbId, titleEncoded) {
         });
 
         if (!res.ok) {
-            setMessage('No se pudo eliminar la valoración.', 'error');
+            setMessage('Could not delete the rating.', 'error');
             return;
         }
 
-        setMessage('Valoración eliminada correctamente.', 'success');
+        setMessage('Rating deleted successfully.', 'success');
         await cargarTops();
     } catch (_) {
-        setMessage('Error de red al intentar eliminar.', 'error');
+        setMessage('Network error while trying to delete.', 'error');
     }
 }
 
