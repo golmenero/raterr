@@ -15,20 +15,20 @@ data class Rating(
     @JoinColumn(name = "movie_id", nullable = false)
     val movie: Movie,
     
-    @Column(name = "direccion", nullable = false)
-    val direccion: Double,
+    @Column(name = "directing", nullable = false)
+    val directing: Double,
     
-    @Column(name = "fotografia", nullable = false)
-    val fotografia: Double,
+    @Column(name = "cinematography", nullable = false)
+    val cinematography: Double,
     
-    @Column(name = "actuacion", nullable = false)
-    val actuacion: Double,
+    @Column(name = "acting", nullable = false)
+    val acting: Double,
     
-    @Column(name = "banda_sonora", nullable = false)
-    val bandaSonora: Double,
+    @Column(name = "soundtrack", nullable = false)
+    val soundtrack: Double,
     
-    @Column(name = "guion", nullable = false)
-    val guion: Double,
+    @Column(name = "screenplay", nullable = false)
+    val screenplay: Double,
     
     @Column(name = "created_at_epoch_ms", nullable = false)
     val createdAtEpochMs: Long

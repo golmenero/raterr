@@ -46,16 +46,16 @@ class AddRatingController(
 
         val existingRating = ratingRepository.findByMovie(movie).firstOrNull()
         require(existingRating == null) {
-            "Ya existe una valoracion para esta pelicula. Eliminala desde Tops antes de crear otra."
+            "Rating already exists for this movie. Delete it from Tops before creating another."
         }
 
         val newRating = Rating(
             movie = movie,
-            direccion = request.direccion,
-            fotografia = request.fotografia,
-            actuacion = request.actuacion,
-            bandaSonora = request.bandaSonora,
-            guion = request.guion,
+            directing = request.directing,
+            cinematography = request.cinematography,
+            acting = request.acting,
+            soundtrack = request.soundtrack,
+            screenplay = request.screenplay,
             createdAtEpochMs = System.currentTimeMillis()
         )
         ratingRepository.save(newRating)
@@ -101,13 +101,13 @@ class AddRatingController(
 
     private fun validateRating(request: AddRatingRequest) {
         listOf(
-            "direccion" to request.direccion,
-            "fotografia" to request.fotografia,
-            "actuacion" to request.actuacion,
-            "bandaSonora" to request.bandaSonora,
-            "guion" to request.guion
+            "directing" to request.directing,
+            "cinematography" to request.cinematography,
+            "acting" to request.acting,
+            "soundtrack" to request.soundtrack,
+            "screenplay" to request.screenplay
         ).forEach { (field, value) ->
-            require(value >= 1.0 && value <= 10.0) { "El campo $field debe estar entre 1 y 10" }
+            require(value >= 1.0 && value <= 10.0) { "Field $field must be between 1 and 10" }
         }
     }
 
@@ -117,7 +117,7 @@ class AddRatingController(
         }
 
         val avg = ratings.map { rating ->
-            (rating.direccion + rating.fotografia + rating.actuacion + rating.bandaSonora + rating.guion) / 5.0
+            (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
         }.average()
 
         return ScoreStats(averageScore = avg, ratingsCount = ratings.size)
@@ -130,33 +130,33 @@ private data class ScoreStats(
 )
 
 data class AddRatingRequest(
-    @field:NotNull(message = "tmdbId es requerido")
+    @field:NotNull(message = "tmdbId is required")
     val tmdbId: Int,
     
-    @field:NotNull(message = "direccion es requerido")
-    @field:Min(value = 1, message = "direccion debe ser mayor o igual a 1")
-    @field:Max(value = 10, message = "direccion debe ser menor o igual a 10")
-    val direccion: Double,
+    @field:NotNull(message = "directing is required")
+    @field:Min(value = 1, message = "directing must be between 1 and 10")
+    @field:Max(value = 10, message = "directing must be between 1 and 10")
+    val directing: Double,
     
-    @field:NotNull(message = "fotografia es requerido")
-    @field:Min(value = 1, message = "fotografia debe ser mayor o igual a 1")
-    @field:Max(value = 10, message = "fotografia debe ser menor o igual a 10")
-    val fotografia: Double,
+    @field:NotNull(message = "cinematography is required")
+    @field:Min(value = 1, message = "cinematography must be between 1 and 10")
+    @field:Max(value = 10, message = "cinematography must be between 1 and 10")
+    val cinematography: Double,
     
-    @field:NotNull(message = "actuacion es requerido")
-    @field:Min(value = 1, message = "actuacion debe ser mayor o igual a 1")
-    @field:Max(value = 10, message = "actuacion debe ser menor o igual a 10")
-    val actuacion: Double,
+    @field:NotNull(message = "acting is required")
+    @field:Min(value = 1, message = "acting must be between 1 and 10")
+    @field:Max(value = 10, message = "acting must be between 1 and 10")
+    val acting: Double,
     
-    @field:NotNull(message = "bandaSonora es requerido")
-    @field:Min(value = 1, message = "bandaSonora debe ser mayor o igual a 1")
-    @field:Max(value = 10, message = "bandaSonora debe ser menor o igual a 10")
-    val bandaSonora: Double,
+    @field:NotNull(message = "soundtrack is required")
+    @field:Min(value = 1, message = "soundtrack must be between 1 and 10")
+    @field:Max(value = 10, message = "soundtrack must be between 1 and 10")
+    val soundtrack: Double,
     
-    @field:NotNull(message = "guion es requerido")
-    @field:Min(value = 1, message = "guion debe ser mayor o igual a 1")
-    @field:Max(value = 10, message = "guion debe ser menor o igual a 10")
-    val guion: Double
+    @field:NotNull(message = "screenplay is required")
+    @field:Min(value = 1, message = "screenplay must be between 1 and 10")
+    @field:Max(value = 10, message = "screenplay must be between 1 and 10")
+    val screenplay: Double
 )
 
 data class AddRatingResponse(

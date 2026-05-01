@@ -22,12 +22,12 @@ class DeleteRatingController(
     fun deleteRating(@PathVariable("id") tmdbId: Int): ResponseEntity<DeleteRatingResponse> {
         return try {
             val movie = movieRepository.findByTmdbId(tmdbId)
-                .orElseThrow { NoSuchElementException("Pelicula no encontrada") }
+                .orElseThrow { NoSuchElementException("Movie not found") }
 
             val deletedCount = ratingRepository.deleteByMovie(movie)
 
             if (deletedCount == 0) {
-                throw NoSuchElementException("Valoracion no encontrada")
+                throw NoSuchElementException("Rating not found")
             }
 
             val ratings = ratingRepository.findByMovie(movie)
@@ -50,7 +50,7 @@ class DeleteRatingController(
         }
 
         val avg = ratings.map { rating ->
-            (rating.direccion + rating.fotografia + rating.actuacion + rating.bandaSonora + rating.guion) / 5.0
+            (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
         }.average()
 
         return ScoreStats(averageScore = avg, ratingsCount = ratings.size)

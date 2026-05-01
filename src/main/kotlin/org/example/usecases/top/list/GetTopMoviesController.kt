@@ -44,14 +44,14 @@ class GetTopMoviesController(
                 val count = ratings.size
 
                 val avgScore = ratings.map { rating ->
-                    (rating.direccion + rating.fotografia + rating.actuacion + rating.bandaSonora + rating.guion) / 5.0
+                    (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
                 }.average()
 
-                val avgDireccion = ratings.map { it.direccion }.average()
-                val avgFotografia = ratings.map { it.fotografia }.average()
-                val avgActuacion = ratings.map { it.actuacion }.average()
-                val avgBandaSonora = ratings.map { it.bandaSonora }.average()
-                val avgGuion = ratings.map { it.guion }.average()
+                val avgDirecting = ratings.map { it.directing }.average()
+                val avgCinematography = ratings.map { it.cinematography }.average()
+                val avgActing = ratings.map { it.acting }.average()
+                val avgSoundtrack = ratings.map { it.soundtrack }.average()
+                val avgScreenplay = ratings.map { it.screenplay }.average()
 
                 GetTopMoviesResponse(
                     tmdbId = movie.tmdbId,
@@ -60,11 +60,11 @@ class GetTopMoviesController(
                     posterPath = movie.posterPath,
                     averageScore = avgScore,
                     ratingsCount = count,
-                    direccion = avgDireccion,
-                    fotografia = avgFotografia,
-                    actuacion = avgActuacion,
-                    bandaSonora = avgBandaSonora,
-                    guion = avgGuion
+                    directing = avgDirecting,
+                    cinematography = avgCinematography,
+                    acting = avgActing,
+                    soundtrack = avgSoundtrack,
+                    screenplay = avgScreenplay
                 )
             }
             .sortedByDescending { it.averageScore }
@@ -80,9 +80,9 @@ data class GetTopMoviesResponse(
     val posterPath: String?,
     val averageScore: Double,
     val ratingsCount: Int,
-    val direccion: Double = 0.0,
-    val fotografia: Double = 0.0,
-    val actuacion: Double = 0.0,
-    val bandaSonora: Double = 0.0,
-    val guion: Double = 0.0
+    val directing: Double = 0.0,
+    val cinematography: Double = 0.0,
+    val acting: Double = 0.0,
+    val soundtrack: Double = 0.0,
+    val screenplay: Double = 0.0
 )

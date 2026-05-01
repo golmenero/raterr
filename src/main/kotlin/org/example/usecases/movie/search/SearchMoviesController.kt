@@ -88,7 +88,7 @@ class SearchMoviesController(
         }
 
         val avg = ratings.map { rating ->
-            (rating.direccion + rating.fotografia + rating.actuacion + rating.bandaSonora + rating.guion) / 5.0
+            (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
         }.average()
 
         return ScoreStats(averageScore = avg, ratingsCount = ratings.size)

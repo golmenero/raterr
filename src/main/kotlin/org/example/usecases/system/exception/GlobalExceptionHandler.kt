@@ -15,13 +15,13 @@ class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNotFound(e: NoSuchElementException): ResponseEntity<ApiError> {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(ApiError(e.message ?: "Recurso no encontrado"))
+            .body(ApiError(e.message ?: "Resource not found"))
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleBadRequest(e: IllegalArgumentException): ResponseEntity<ApiError> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ApiError(e.message ?: "Solicitud invalida"))
+            .body(ApiError(e.message ?: "Invalid request"))
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
@@ -29,7 +29,7 @@ class GlobalExceptionHandler {
         val errorMessage = e.bindingResult.fieldErrors
             .firstOrNull()
             ?.defaultMessage
-            ?: "Error de validacion"
+            ?: "Validation error"
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ApiError(errorMessage))
     }
@@ -37,6 +37,6 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleGeneric(e: Exception): ResponseEntity<ApiError> {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiError(e.message ?: "Error interno del servidor"))
+            .body(ApiError(e.message ?: "Internal server error"))
     }
 }

@@ -26,7 +26,7 @@ class TmdbClient(
             .uri { builder ->
                 builder.path("/search/movie")
                     .queryParam("api_key", apiKey)
-                    .queryParam("language", "es-ES")
+                    .queryParam("language", "en-US")
                     .queryParam("include_adult", false)
                     .queryParam("page", 1)
                     .queryParam("query", query)
@@ -46,18 +46,18 @@ class TmdbClient(
             .uri { builder ->
                 builder.path("/movie/{id}")
                     .queryParam("api_key", apiKey)
-                    .queryParam("language", "es-ES")
+                    .queryParam("language", "en-US")
                     .build(tmdbId)
             }
             .retrieve()
             .bodyToMono(TmdbMovie::class.java)
             .block()
-            ?: throw RuntimeException("No se pudo obtener detalles de la pelicula")
+            ?: throw RuntimeException("Could not fetch movie details")
     }
 
     private fun requireApiKey() {
         require(apiKey.isNotBlank()) {
-            "Falta TMDB_API_KEY. Configura la variable de entorno antes de usar busquedas o detalles de peliculas."
+            "TMDB_API_KEY is missing. Set the environment variable before using search or movie details."
         }
     }
 }

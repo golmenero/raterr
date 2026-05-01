@@ -23,9 +23,3 @@ raterr:
   tmdb:
     api-key: ${TMDB_API_KEY:}
     base-url: https://api.themoviedb.org/3
-
-logging:
-  level:
-    root: INFO
-    org.example: DEBUG
-    org.hibernate.SQL: DEBUG
