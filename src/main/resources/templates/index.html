@@ -22,22 +22,46 @@
         <section class="panel">
             <div class="search-toolbar-centered">
                 <div class="heading-filter search-inline">
-                    <input id="q" type="text" placeholder="Search movie" autocomplete="off" aria-label="Search movie">
-                    <button class="primary-button icon-button icon-only-button" type="button" onclick="search()" aria-label="Search" title="Search">
-                        <span class="button-icon" aria-hidden="true">
-                            <svg class="button-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <circle cx="11" cy="11" r="6.5"></circle>
-                                <line x1="16" y1="16" x2="21" y2="21"></line>
-                            </svg>
-                        </span>
-                    </button>
+                    <form th:action="@{/}" method="get" style="display: contents;">
+                        <input id="q" name="q" type="text" th:value="${query}" placeholder="Search movie" autocomplete="off" aria-label="Search movie">
+                        <button class="primary-button icon-button icon-only-button" type="submit" aria-label="Search" title="Search">
+                            <span class="button-icon" aria-hidden="true">
+                                <svg class="button-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <circle cx="11" cy="11" r="6.5"></circle>
+                                    <line x1="16" y1="16" x2="21" y2="21"></line>
+                                </svg>
+                            </span>
+                        </button>
+                    </form>
                 </div>
             </div>
-            <div id="results" class="results-grid"></div>
+            
+            <div th:if="${movies != null}" id="results" class="results-grid">
+                <div th:if="${#lists.isEmpty(movies)}" class="empty-state">Try with another title, year or original name.</div>
+                <article th:each="m : ${movies}" th:class="'result-card' + (${m.ratingsCount > 0} ? ' result-card-disabled' : '')">
+                    <div class="poster-frame">
+                        <img th:if="${m.posterPath != null}" th:src="@{'https://image.tmdb.org/t/p/w185' + ${m.posterPath}}" th:alt="'Poster of ' + ${m.title}">
+                        <div th:unless="${m.posterPath != null}" class="poster-fallback" th:text="${#strings.toUpperCase(#strings.substring(m.title, 0, 1))}">?</div>
+                    </div>
+                    <div class="result-content">
+                        <div class="tag-row result-meta-row">
+                            <span class="tag" th:text="${m.releaseYear != null} ? ${m.releaseYear} : 'Unknown year'">Year</span>
+                            <span th:if="${m.ratingsCount > 0}" class="result-rating-inline">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <span th:if="${i <= #numbers.floor(m.averageScore / 2)}">★</span>
+                                    <span th:unless="${i <= #numbers.floor(m.averageScore / 2)}">☆</span>
+                                </span>
+                            </span>
+                        </div>
+                        <h3 class="result-title" th:text="${m.title}">Title</h3>
+                        <p class="result-overview" th:text="${m.overview != null and m.overview.trim().length() > 0} ? ${m.overview} : 'No synopsis available right now.'">Overview</p>
+                    </div>
+                    <a th:if="${m.ratingsCount == 0}" th:href="@{/rate(id=${m.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${m.title}"></a>
+                </article>
+            </div>
+            <div th:unless="${movies != null}" id="results" class="results-grid"></div>
         </section>
     </main>
 </div>
-
-<script type="module" src="/js/search.js"></script>
 </body>
 </html>

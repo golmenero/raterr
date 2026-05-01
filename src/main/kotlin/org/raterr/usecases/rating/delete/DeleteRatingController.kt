@@ -1,25 +1,25 @@
 package org.raterr.usecases.rating.delete
 
 import org.raterr.usecases.movie.MovieRepository
-import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import java.util.NoSuchElementException
 
-@RestController
+@Controller
 class DeleteRatingController(
     private val movieRepository: MovieRepository,
     private val ratingRepository: RatingRepository
 ) {
 
-    @DeleteMapping("/api/movie/{id}/rating")
-    @Transactional
-    fun deleteRating(@PathVariable("id") tmdbId: Int): ResponseEntity<DeleteRatingResponse> {
+    @PostMapping("/top/delete/{id}")
+    fun deleteRating(
+        @PathVariable("id") tmdbId: Int,
+        redirectAttributes: RedirectAttributes
+    ): String {
         return try {
             val movie = movieRepository.findByTmdbId(tmdbId)
                 .orElseThrow { NoSuchElementException("Movie not found") }
@@ -30,40 +30,14 @@ class DeleteRatingController(
                 throw NoSuchElementException("Rating not found")
             }
 
-            val ratings = ratingRepository.findByMovie(movie)
-            val stats = calculateStats(ratings)
-
-            val response = DeleteRatingResponse(
-                tmdbId = tmdbId,
-                averageScore = stats.averageScore,
-                ratingsCount = stats.ratingsCount
-            )
-            ResponseEntity.ok(response)
+            redirectAttributes.addFlashAttribute("success", "Rating deleted successfully.")
+            "redirect:/top"
         } catch (e: NoSuchElementException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
+            redirectAttributes.addFlashAttribute("error", "Could not delete the rating.")
+            "redirect:/top"
+        } catch (e: Exception) {
+            redirectAttributes.addFlashAttribute("error", "Could not delete the rating.")
+            "redirect:/top"
         }
-    }
-
-    private fun calculateStats(ratings: List<Rating>): ScoreStats {
-        if (ratings.isEmpty()) {
-            return ScoreStats(averageScore = 0.0, ratingsCount = 0)
-        }
-
-        val avg = ratings.map { rating ->
-            (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
-        }.average()
-
-        return ScoreStats(averageScore = avg, ratingsCount = ratings.size)
     }
 }
-
-private data class ScoreStats(
-    val averageScore: Double,
-    val ratingsCount: Int
-)
-
-data class DeleteRatingResponse(
-    val tmdbId: Int,
-    val averageScore: Double,
-    val ratingsCount: Int
-)

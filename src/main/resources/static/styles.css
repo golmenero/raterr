@@ -1029,6 +1029,10 @@ input[type="range"] {
     display: flex;
     align-items: center;
     gap: 16px;
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .user-info {
@@ -1042,6 +1046,24 @@ input[type="range"] {
     font-weight: 600;
     font-size: 0.92rem;
     font-family: var(--font-ui);
+}
+
+.logout-button {
+    background: transparent !important;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+.logout-button:hover {
+    color: var(--text);
+    background: transparent !important;
 }
 
 .auth-links {

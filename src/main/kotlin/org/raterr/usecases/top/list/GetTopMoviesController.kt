@@ -1,28 +1,32 @@
 package org.raterr.usecases.top.list
 
 import org.raterr.usecases.movie.MovieRepository
-import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
+import org.raterr.usecases.rating.RatingRepository
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
 
-@RestController
+@Controller
 class GetTopMoviesController(
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
+    private val ratingRepository: RatingRepository
 ) {
 
-    @GetMapping("/api/tops")
-    @Transactional(readOnly = true)
-    fun getTops(
+    @GetMapping("/top")
+    fun topsPage(
         @RequestParam("limit", required = false) limit: Int?,
-        @RequestParam("year", required = false) year: Int?
-    ): ResponseEntity<List<GetTopMoviesResponse>> {
-        return try {
+        @RequestParam("year", required = false) year: Int?,
+        model: Model
+    ): String {
+        try {
             val tops = getTopMovies(limit, year)
-            ResponseEntity.ok(tops)
+            model.addAttribute("tops", tops)
+            model.addAttribute("selectedYear", year)
+            return "top"
         } catch (e: Exception) {
-            ResponseEntity.internalServerError().build()
+            model.addAttribute("error", "Could not load the tops.")
+            return "top"
         }
     }
 

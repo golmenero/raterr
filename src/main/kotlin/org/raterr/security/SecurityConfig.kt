@@ -29,11 +29,11 @@ class SecurityConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { csrf ->
-                csrf.ignoringRequestMatchers("/api/login", "/api/register")
+                csrf.ignoringRequestMatchers("/api/**")
             }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/login", "/register", "/api/login", "/api/register").permitAll()
+                    .requestMatchers("/login", "/register").permitAll()
                     .requestMatchers("/static/**", "/js/**", "/css/**", "/styles.css").permitAll()
                     .requestMatchers("/api/health").permitAll()
                     .anyRequest().authenticated()
@@ -41,7 +41,7 @@ class SecurityConfig {
             .formLogin { form ->
                 form
                     .loginPage("/login")
-                    .loginProcessingUrl("/login")
+                    .loginProcessingUrl("/login/process")
                     .defaultSuccessUrl("/", true)
                     .failureUrl("/login?error=true")
                     .permitAll()
@@ -49,7 +49,7 @@ class SecurityConfig {
             .logout { logout ->
                 logout
                     .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login")
+                    .logoutSuccessUrl("/login?logout=true")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                     .permitAll()

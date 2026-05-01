@@ -6,25 +6,31 @@ import org.raterr.usecases.movie.Movie
 import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
-import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RequestParam
 
-@RestController
+@Controller
 class GetMovieDetailsController(
     private val tmdbClient: TmdbClient,
     private val movieRepository: MovieRepository,
     private val ratingRepository: RatingRepository
 ) {
 
-    @GetMapping("/api/movie/{id}")
-    fun getMovie(@PathVariable("id") tmdbId: Int): ResponseEntity<GetMovieDetailsResponse> {
-        return try {
+    @GetMapping("/rate")
+    fun ratePage(@RequestParam("id") tmdbId: Int, model: Model): String {
+        try {
             val movie = getMovieByTmdbId(tmdbId)
-            ResponseEntity.ok(movie)
+            val ratings = ratingRepository.findByMovieTmdbId(tmdbId)
+            val alreadyRated = ratings.isNotEmpty()
+            
+            model.addAttribute("movie", movie)
+            model.addAttribute("alreadyRated", alreadyRated)
+            return "rate"
         } catch (e: Exception) {
-            ResponseEntity.notFound().build()
+            model.addAttribute("error", "Could not load the movie.")
+            return "rate"
         }
     }
 

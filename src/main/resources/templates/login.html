@@ -14,7 +14,10 @@
         <section class="auth-card">
             <h1 class="auth-title">Sign in to Raterr</h1>
             
-            <form th:action="@{/login}" method="post" class="auth-form">
+            <div th:if="${param.error}" class="error-message">Invalid username or password.</div>
+            <div th:if="${param.logout}" class="success-message">You have been logged out successfully.</div>
+            
+            <form th:action="@{/login/process}" method="post" class="auth-form">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 
                 <div class="form-group">

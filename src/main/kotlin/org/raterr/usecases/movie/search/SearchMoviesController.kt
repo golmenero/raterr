@@ -5,26 +5,26 @@ import org.raterr.TmdbMovie
 import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
-import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
 
-@RestController
+@Controller
 class SearchMoviesController(
     private val tmdbClient: TmdbClient,
     private val movieRepository: MovieRepository,
     private val ratingRepository: RatingRepository
 ) {
 
-    @GetMapping("/api/search")
-    fun search(@RequestParam("q") query: String): ResponseEntity<List<SearchMoviesResponse>> {
-        return try {
+    @GetMapping("/")
+    fun searchPage(@RequestParam("q", required = false) query: String?, model: Model): String {
+        if (!query.isNullOrBlank()) {
             val results = searchAndCacheMovies(query)
-            ResponseEntity.ok(results)
-        } catch (e: Exception) {
-            ResponseEntity.badRequest().build()
+            model.addAttribute("query", query)
+            model.addAttribute("movies", results)
         }
+        return "index"
     }
 
     private fun searchAndCacheMovies(query: String): List<SearchMoviesResponse> {

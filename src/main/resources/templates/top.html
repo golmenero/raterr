@@ -22,19 +22,50 @@
         <section class="panel">
             <div class="section-heading">
                 <div class="heading-filter">
-                    <input id="year" type="number" min="1900" max="2100" placeholder="Year" aria-label="Filter by year">
-                    <button class="primary-button icon-button icon-only-button" type="button" onclick="loadTops()" aria-label="Refresh ranking">
-                        <span class="button-icon" aria-hidden="true">↻</span>
-                    </button>
+                    <form th:action="@{/top}" method="get" style="display: contents;">
+                        <input id="year" name="year" type="number" min="1900" max="2100" th:value="${selectedYear}" placeholder="Year" aria-label="Filter by year">
+                        <button class="primary-button icon-button icon-only-button" type="submit" aria-label="Refresh ranking">
+                            <span class="button-icon" aria-hidden="true">↻</span>
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <div id="msg" class="feedback hidden spacer-top"></div>
-            <div id="list" class="top-list spacer-top"></div>
+            <div th:if="${error}" id="msg" class="feedback error spacer-top" th:text="${error}"></div>
+            <div th:if="${success}" id="msg" class="feedback success spacer-top" th:text="${success}"></div>
+            
+            <div th:if="${tops != null}" id="list" class="top-list spacer-top">
+                <div th:if="${#lists.isEmpty(tops)}" class="empty-state">No rated movies yet for this filter.</div>
+                <article th:each="m, iterStat : ${tops}" th:class="'top-card list-poster-card' + (${iterStat.index < 3 and m.posterPath != null} ? '' : ' no-poster')">
+                    <div th:if="${iterStat.index < 3 and m.posterPath != null}" class="top-poster poster-frame">
+                        <img th:src="@{'https://image.tmdb.org/t/p/w185' + ${m.posterPath}}" th:alt="'Poster of ' + ${m.title}">
+                    </div>
+                    <div class="top-info">
+                        <div class="tag-row top-tag-row">
+                            <span class="tag" th:text="'#' + ${iterStat.index + 1}">#1</span>
+                            <span class="tag" th:text="${m.releaseYear != null} ? ${m.releaseYear} : 'Unknown year'">Year</span>
+                        </div>
+                        <h3 class="top-title" th:text="${m.title}">Title</h3>
+                        <p class="rating-inline compact-stars">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                <span th:if="${i <= #numbers.floor(m.averageScore / 2)}">★</span>
+                                <span th:unless="${i <= #numbers.floor(m.averageScore / 2)}">☆</span>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="top-actions">
+                        <form th:action="@{'/top/delete/' + ${m.tmdbId}}" method="post" style="display: inline;" onsubmit="return confirm('Delete the rating for \'' + ${m.title} + '\'?');">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button class="top-delete-button" type="submit" aria-label="Delete rating">
+                                <span class="button-icon" aria-hidden="true">🗑</span>
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+            <div th:unless="${tops != null}" id="list" class="top-list spacer-top"></div>
         </section>
     </main>
 </div>
-
-<script type="module" src="/js/top.js"></script>
 </body>
 </html>

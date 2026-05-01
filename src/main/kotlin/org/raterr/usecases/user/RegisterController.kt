@@ -1,59 +1,68 @@
 package org.raterr.usecases.user
 
 import org.raterr.security.CustomUserDetailsService
-import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
-data class RegisterRequest(val username: String, val email: String, val password: String)
-data class RegisterResponse(val username: String? = null, val message: String? = null)
-
-@RestController
+@Controller
 class RegisterController(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val userDetailsService: CustomUserDetailsService
 ) {
 
-    @PostMapping("/api/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<RegisterResponse> {
-        if (request.username.isBlank() || request.email.isBlank() || request.password.isBlank()) {
-            return ResponseEntity.badRequest()
-                .body(RegisterResponse(message = "All fields are required"))
+    @GetMapping("/register")
+    fun registerPage(model: Model): String {
+        return "register"
+    }
+
+    @PostMapping("/register")
+    fun register(
+        @RequestParam("username") username: String,
+        @RequestParam("email") email: String,
+        @RequestParam("password") password: String,
+        redirectAttributes: RedirectAttributes
+    ): String {
+        if (username.isBlank() || email.isBlank() || password.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "All fields are required")
+            return "redirect:/register"
         }
 
-        if (request.username.length < 3 || request.username.length > 50) {
-            return ResponseEntity.badRequest()
-                .body(RegisterResponse(message = "Username must be between 3 and 50 characters"))
+        if (username.length < 3 || username.length > 50) {
+            redirectAttributes.addFlashAttribute("error", "Username must be between 3 and 50 characters")
+            return "redirect:/register"
         }
 
-        if (request.password.length < 8) {
-            return ResponseEntity.badRequest()
-                .body(RegisterResponse(message = "Password must be at least 8 characters"))
+        if (password.length < 8) {
+            redirectAttributes.addFlashAttribute("error", "Password must be at least 8 characters")
+            return "redirect:/register"
         }
 
-        if (userRepository.existsById(request.username)) {
-            return ResponseEntity.badRequest()
-                .body(RegisterResponse(message = "Username already exists"))
+        if (userRepository.existsById(username)) {
+            redirectAttributes.addFlashAttribute("error", "Username already exists")
+            return "redirect:/register"
         }
 
-        if (userRepository.existsByEmail(request.email)) {
-            return ResponseEntity.badRequest()
-                .body(RegisterResponse(message = "Email already exists"))
+        if (userRepository.existsByEmail(email)) {
+            redirectAttributes.addFlashAttribute("error", "Email already exists")
+            return "redirect:/register"
         }
 
-        val hashedPassword = passwordEncoder.encode(request.password)
+        val hashedPassword = passwordEncoder.encode(password)
 
         val user = User(
-            username = request.username,
-            email = request.email,
+            username = username,
+            email = email,
             passwordHash = hashedPassword
         )
 
         userRepository.save(user)
 
-        return ResponseEntity.ok(RegisterResponse(username = request.username))
+        return "redirect:/login"
     }
 }
