@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import org.example.usecases.rating.Rating
 
 @Entity
-@Table(name = "movie")
+@Table(name = "movies")
 data class Movie(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
