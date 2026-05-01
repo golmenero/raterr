@@ -2,6 +2,7 @@ package org.raterr.usecases.rating
 
 import jakarta.persistence.*
 import org.raterr.usecases.movie.Movie
+import org.raterr.usecases.user.User
 
 @Entity
 @Table(name = "ratings")
@@ -14,6 +15,10 @@ data class Rating(
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "movie_id", nullable = false)
     val movie: Movie,
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    val user: User? = null,
     
     @Column(name = "directing", nullable = false)
     val directing: Double,
