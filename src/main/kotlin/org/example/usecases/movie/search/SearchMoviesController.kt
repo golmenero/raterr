@@ -2,7 +2,6 @@ package org.example.usecases.movie.search
 
 import org.example.TmdbClient
 import org.example.TmdbMovie
-import org.example.usecases.movie.Movie
 import org.example.usecases.movie.MovieRepository
 import org.example.usecases.rating.Rating
 import org.example.usecases.rating.RatingRepository
@@ -31,52 +30,27 @@ class SearchMoviesController(
     private fun searchAndCacheMovies(query: String): List<SearchMoviesResponse> {
         val tmdbMovies = tmdbClient.searchMovies(query).take(16)
         return tmdbMovies.map { tmdbMovie ->
-            val movie = upsertMovie(tmdbMovie)
-            buildResponse(movie)
+            buildResponseFromTmdb(tmdbMovie)
         }
     }
 
-    private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
-        val existing = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
-
-        return if (existing != null) {
-            val updated = existing.copy(
-                title = tmdbMovie.title,
-                originalTitle = tmdbMovie.originalTitle,
-                overview = tmdbMovie.overview,
-                releaseDate = tmdbMovie.releaseDate,
-                releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
-                posterPath = tmdbMovie.posterPath,
-                tmdbVoteAverage = tmdbMovie.voteAverage
-            )
-            movieRepository.save(updated)
+    private fun buildResponseFromTmdb(tmdbMovie: TmdbMovie): SearchMoviesResponse {
+        val movie = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
+        val ratings = if (movie != null) {
+            ratingRepository.findByMovie(movie)
         } else {
-            val newMovie = Movie(
-                tmdbId = tmdbMovie.id,
-                title = tmdbMovie.title,
-                originalTitle = tmdbMovie.originalTitle,
-                overview = tmdbMovie.overview,
-                releaseDate = tmdbMovie.releaseDate,
-                releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
-                posterPath = tmdbMovie.posterPath,
-                tmdbVoteAverage = tmdbMovie.voteAverage
-            )
-            movieRepository.save(newMovie)
+            emptyList()
         }
-    }
-
-    private fun buildResponse(movie: Movie): SearchMoviesResponse {
-        val ratings = ratingRepository.findByMovie(movie)
         val stats = calculateStats(ratings)
 
         return SearchMoviesResponse(
-            tmdbId = movie.tmdbId,
-            title = movie.title,
-            overview = movie.overview,
-            releaseDate = movie.releaseDate,
-            releaseYear = movie.releaseYear,
-            posterPath = movie.posterPath,
-            tmdbVoteAverage = movie.tmdbVoteAverage,
+            tmdbId = tmdbMovie.id,
+            title = tmdbMovie.title,
+            overview = tmdbMovie.overview,
+            releaseDate = tmdbMovie.releaseDate,
+            releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
+            posterPath = tmdbMovie.posterPath,
+            tmdbVoteAverage = tmdbMovie.voteAverage,
             averageScore = stats.averageScore,
             ratingsCount = stats.ratingsCount
         )
