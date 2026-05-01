@@ -1,24 +1,25 @@
 package org.example.service
 
-import org.example.db.Movies
-import org.example.db.Ratings
-import org.example.model.MovieDto
-import org.example.model.MovieSuggestionDto
-import org.example.model.RatingRequest
-import org.example.model.RatingResult
+import org.example.model.dto.MovieDto
+import org.example.model.dto.MovieSuggestionDto
+import org.example.model.dto.RatingRequest
+import org.example.model.dto.RatingResult
+import org.example.model.entity.Movie
+import org.example.model.entity.Rating
+import org.example.repository.MovieRepository
+import org.example.repository.RatingRepository
 import org.example.tmdb.TmdbClient
 import org.example.tmdb.TmdbMovie
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.NoSuchElementException
 
-class RatingService(private val tmdbClient: TmdbClient) {
+@Service
+class RatingService(
+    private val tmdbClient: TmdbClient,
+    private val movieRepository: MovieRepository,
+    private val ratingRepository: RatingRepository
+) {
     private val maxSearchResults = 16
 
     suspend fun searchSuggestions(query: String, limit: Int = 5): List<MovieSuggestionDto> {
@@ -41,49 +42,46 @@ class RatingService(private val tmdbClient: TmdbClient) {
     suspend fun searchAndCacheMovies(query: String): List<MovieDto> {
         val tmdbMovies = tmdbClient.searchMovies(query).take(maxSearchResults)
         return tmdbMovies.map { tmdbMovie ->
-            val movieRow = upsertMovie(tmdbMovie)
-            buildMovieDto(movieRow)
+            val movie = upsertMovie(tmdbMovie)
+            buildMovieDto(movie)
         }
     }
 
     suspend fun getMovieByTmdbId(tmdbId: Int): MovieDto {
-        val localMovie = transaction {
-            Movies.selectAll().where { Movies.tmdbId eq tmdbId }.singleOrNull()
-        }
+        val localMovie = movieRepository.findByTmdbId(tmdbId).orElse(null)
 
-        val movieRow = localMovie ?: run {
+        val movie = localMovie ?: run {
             val tmdbMovie = tmdbClient.movieDetails(tmdbId)
             upsertMovie(tmdbMovie)
         }
 
-        return buildMovieDto(movieRow)
+        return buildMovieDto(movie)
     }
 
+    @Transactional
     suspend fun addRating(request: RatingRequest): RatingResult {
         validateRating(request)
 
-        val movieRow = transaction {
-            Movies.selectAll().where { Movies.tmdbId eq request.tmdbId }.singleOrNull()
-        } ?: upsertMovie(tmdbClient.movieDetails(request.tmdbId))
+        val movie = movieRepository.findByTmdbId(request.tmdbId).orElse(null)
+            ?: upsertMovie(tmdbClient.movieDetails(request.tmdbId))
 
-        transaction {
-            val existingRating = Ratings.selectAll().where { Ratings.movieId eq movieRow[Movies.id] }.singleOrNull()
-            require(existingRating == null) {
-                "Ya existe una valoracion para esta pelicula. Eliminala desde Tops antes de crear otra."
-            }
-
-            Ratings.insert {
-                it[movieId] = movieRow[Movies.id]
-                it[direccion] = request.direccion
-                it[fotografia] = request.fotografia
-                it[actuacion] = request.actuacion
-                it[bandaSonora] = request.bandaSonora
-                it[guion] = request.guion
-                it[createdAtEpochMs] = System.currentTimeMillis()
-            }
+        val existingRating = ratingRepository.findByMovie(movie).firstOrNull()
+        require(existingRating == null) {
+            "Ya existe una valoracion para esta pelicula. Eliminala desde Tops antes de crear otra."
         }
 
-        val stats = transaction { calculateStats(movieRow[Movies.id]) }
+        val newRating = Rating(
+            movie = movie,
+            direccion = request.direccion,
+            fotografia = request.fotografia,
+            actuacion = request.actuacion,
+            bandaSonora = request.bandaSonora,
+            guion = request.guion,
+            createdAtEpochMs = System.currentTimeMillis()
+        )
+        ratingRepository.save(newRating)
+
+        val stats = calculateStats(movie)
         return RatingResult(
             tmdbId = request.tmdbId,
             averageScore = stats.averageScore,
@@ -91,25 +89,23 @@ class RatingService(private val tmdbClient: TmdbClient) {
         )
     }
 
+    @Transactional
     fun deleteRatingByTmdbId(tmdbId: Int): RatingResult {
-        return transaction {
-            val movieRow = Movies.selectAll().where { Movies.tmdbId eq tmdbId }.singleOrNull()
-                ?: throw NoSuchElementException("Pelicula no encontrada")
+        val movie = movieRepository.findByTmdbId(tmdbId)
+            .orElseThrow { NoSuchElementException("Pelicula no encontrada") }
 
-            val movieInternalId = movieRow[Movies.id]
-            val deletedCount = Ratings.deleteWhere { Ratings.movieId eq movieInternalId }
+        val deletedCount = ratingRepository.deleteByMovie(movie)
 
-            if (deletedCount == 0) {
-                throw NoSuchElementException("Valoracion no encontrada")
-            }
-
-            val stats = calculateStats(movieInternalId)
-            RatingResult(
-                tmdbId = tmdbId,
-                averageScore = stats.averageScore,
-                ratingsCount = stats.ratingsCount
-            )
+        if (deletedCount == 0) {
+            throw NoSuchElementException("Valoracion no encontrada")
         }
+
+        val stats = calculateStats(movie)
+        return RatingResult(
+            tmdbId = tmdbId,
+            averageScore = stats.averageScore,
+            ratingsCount = stats.ratingsCount
+        )
     }
 
     private fun validateRating(request: RatingRequest) {
@@ -124,76 +120,69 @@ class RatingService(private val tmdbClient: TmdbClient) {
         }
     }
 
-    private fun upsertMovie(tmdbMovie: TmdbMovie): ResultRow {
-        val existing = transaction {
-            Movies.selectAll().where { Movies.tmdbId eq tmdbMovie.id }.singleOrNull()
-        }
+    @Transactional
+    private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
+        val existing = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
 
         return if (existing != null) {
-            transaction {
-                Movies.update({ Movies.id eq existing[Movies.id] }) {
-                    it[title] = tmdbMovie.title
-                    it[originalTitle] = tmdbMovie.originalTitle
-                    it[overview] = tmdbMovie.overview
-                    it[releaseDate] = tmdbMovie.releaseDate
-                    it[releaseYear] = tmdbMovie.releaseDate?.take(4)?.toIntOrNull()
-                    it[posterPath] = tmdbMovie.posterPath
-                    it[tmdbVoteAverage] = tmdbMovie.voteAverage
-                }
-                Movies.selectAll().where { Movies.id eq existing[Movies.id] }.single()
-            }
+            val updated = existing.copy(
+                title = tmdbMovie.title,
+                originalTitle = tmdbMovie.originalTitle,
+                overview = tmdbMovie.overview,
+                releaseDate = tmdbMovie.releaseDate,
+                releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
+                posterPath = tmdbMovie.posterPath,
+                tmdbVoteAverage = tmdbMovie.voteAverage
+            )
+            movieRepository.save(updated)
         } else {
-            val insertedId = transaction {
-                Movies.insertAndGetId {
-                    it[tmdbId] = tmdbMovie.id
-                    it[title] = tmdbMovie.title
-                    it[originalTitle] = tmdbMovie.originalTitle
-                    it[overview] = tmdbMovie.overview
-                    it[releaseDate] = tmdbMovie.releaseDate
-                    it[releaseYear] = tmdbMovie.releaseDate?.take(4)?.toIntOrNull()
-                    it[posterPath] = tmdbMovie.posterPath
-                    it[tmdbVoteAverage] = tmdbMovie.voteAverage
-                }
-            }
-            transaction {
-                Movies.selectAll().where { Movies.id eq insertedId }.single()
-            }
+            val newMovie = Movie(
+                tmdbId = tmdbMovie.id,
+                title = tmdbMovie.title,
+                originalTitle = tmdbMovie.originalTitle,
+                overview = tmdbMovie.overview,
+                releaseDate = tmdbMovie.releaseDate,
+                releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
+                posterPath = tmdbMovie.posterPath,
+                tmdbVoteAverage = tmdbMovie.voteAverage
+            )
+            movieRepository.save(newMovie)
         }
     }
 
-    private fun buildMovieDto(movieRow: ResultRow): MovieDto {
-        val stats = transaction { calculateStats(movieRow[Movies.id]) }
+    private fun buildMovieDto(movie: Movie): MovieDto {
+        val stats = calculateStats(movie)
 
         return MovieDto(
-            tmdbId = movieRow[Movies.tmdbId],
-            title = movieRow[Movies.title],
-            overview = movieRow[Movies.overview],
-            releaseDate = movieRow[Movies.releaseDate],
-            releaseYear = movieRow[Movies.releaseYear],
-            posterPath = movieRow[Movies.posterPath],
-            tmdbVoteAverage = movieRow[Movies.tmdbVoteAverage],
+            tmdbId = movie.tmdbId,
+            title = movie.title,
+            overview = movie.overview,
+            releaseDate = movie.releaseDate,
+            releaseYear = movie.releaseYear,
+            posterPath = movie.posterPath,
+            tmdbVoteAverage = movie.tmdbVoteAverage,
             averageScore = stats.averageScore,
             ratingsCount = stats.ratingsCount
         )
     }
 
-    private fun calculateStats(movieInternalId: EntityID<Int>): ScoreStats {
-        val rows = Ratings.selectAll().where { Ratings.movieId eq movieInternalId }.toList()
-        if (rows.isEmpty()) {
+    private fun calculateStats(movie: Movie): ScoreStats {
+        val ratings = ratingRepository.findByMovie(movie)
+        if (ratings.isEmpty()) {
             return ScoreStats(averageScore = 0.0, ratingsCount = 0)
         }
 
-        val avg = rows.map { row ->
+        val avg = ratings.map { rating ->
             (
-                row[Ratings.direccion] +
-                    row[Ratings.fotografia] +
-                    row[Ratings.actuacion] +
-                    row[Ratings.bandaSonora] +
-                    row[Ratings.guion]
+                rating.direccion +
+                    rating.fotografia +
+                    rating.actuacion +
+                    rating.bandaSonora +
+                    rating.guion
                 ) / 5.0
         }.average()
 
-        return ScoreStats(averageScore = avg, ratingsCount = rows.size)
+        return ScoreStats(averageScore = avg, ratingsCount = ratings.size)
     }
 }
 

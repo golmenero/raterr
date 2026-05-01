@@ -2,47 +2,58 @@ package org.example.tmdb
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.request.parameter
-import io.ktor.serialization.jackson.jackson
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Mono
 
-class TmdbClient(private val apiKey: String) {
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            jackson()
-        }
-    }
+@Service
+class TmdbClient(
+    @Value("\${raterr.tmdb.api-key}")
+    private val apiKey: String,
+    
+    @Value("\${raterr.tmdb.base-url}")
+    private val baseUrl: String = "https://api.themoviedb.org/3"
+) {
+    private val webClient: WebClient = WebClient.builder()
+        .baseUrl(baseUrl)
+        .build()
 
     suspend fun searchMovies(query: String): List<TmdbMovie> {
         if (query.isBlank()) return emptyList()
         requireApiKey()
 
-        val response = client.get("https://api.themoviedb.org/3/search/movie") {
-            parameter("api_key", apiKey)
-            parameter("language", "es-ES")
-            parameter("include_adult", false)
-            parameter("page", 1)
-            parameter("query", query)
-        }.body<TmdbSearchResponse>()
-
-        return response.results
+        return webClient.get()
+            .uri { builder ->
+                builder.path("/search/movie")
+                    .queryParam("api_key", apiKey)
+                    .queryParam("language", "es-ES")
+                    .queryParam("include_adult", false)
+                    .queryParam("page", 1)
+                    .queryParam("query", query)
+                    .build()
+            }
+            .retrieve()
+            .bodyToMono(TmdbSearchResponse::class.java)
+            .toFuture()
+            .await()
+            .results
     }
 
     suspend fun movieDetails(tmdbId: Int): TmdbMovie {
         requireApiKey()
 
-        return client.get("https://api.themoviedb.org/3/movie/$tmdbId") {
-            parameter("api_key", apiKey)
-            parameter("language", "es-ES")
-        }.body()
-    }
-
-    fun close() {
-        client.close()
+        return webClient.get()
+            .uri { builder ->
+                builder.path("/movie/{id}")
+                    .queryParam("api_key", apiKey)
+                    .queryParam("language", "es-ES")
+                    .build(tmdbId)
+            }
+            .retrieve()
+            .bodyToMono(TmdbMovie::class.java)
+            .toFuture()
+            .await()
     }
 
     private fun requireApiKey() {
@@ -75,4 +86,3 @@ data class TmdbMovie(
     @JsonProperty("vote_average")
     val voteAverage: Double? = null
 )
-

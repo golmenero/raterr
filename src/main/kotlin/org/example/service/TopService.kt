@@ -1,92 +1,59 @@
 package org.example.service
 
-import org.example.db.Movies
-import org.example.db.Ratings
-import org.example.model.TopMovieDto
-import org.jetbrains.exposed.sql.andWhere
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.example.model.dto.TopMovieDto
+import org.example.repository.MovieRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-class TopService {
+@Service
+class TopService(
+    private val movieRepository: MovieRepository
+) {
 
+    @Transactional(readOnly = true)
     fun getTop(limit: Int?, year: Int?): List<TopMovieDto> {
         val safeLimit = limit?.coerceIn(1, 100)
 
-        return transaction {
-            val query = (Movies leftJoin Ratings).selectAll()
-            if (year != null) {
-                query.andWhere { Movies.releaseYear eq year }
-            }
+        val movies = movieRepository.findAllWithRatings()
 
-            val grouped = linkedMapOf<Int, TopAccumulator>()
-
-            query.forEach { row ->
-                val key = row[Movies.id].value
-                val acc = grouped.getOrPut(key) {
-                    TopAccumulator(
-                        tmdbId = row[Movies.tmdbId],
-                        title = row[Movies.title],
-                        releaseYear = row[Movies.releaseYear],
-                        posterPath = row[Movies.posterPath]
-                    )
-                }
-
-                try {
-                    row[Ratings.id]
-                    val perRatingScore = (
-                        row[Ratings.direccion] +
-                            row[Ratings.fotografia] +
-                            row[Ratings.actuacion] +
-                            row[Ratings.bandaSonora] +
-                            row[Ratings.guion]
-                        ) / 5.0
-                    acc.scoreSum += perRatingScore
-                    acc.direccionSum += row[Ratings.direccion]
-                    acc.fotografiaSum += row[Ratings.fotografia]
-                    acc.actuacionSum += row[Ratings.actuacion]
-                    acc.bandaSonoraSum += row[Ratings.bandaSonora]
-                    acc.guionSum += row[Ratings.guion]
-                    acc.count += 1
-                } catch (_: Exception) {
-                    // row viene de left join, si no hay rating esta fila es null
-                }
-            }
-
-            val sorted = grouped.values
-                .filter { it.count > 0 }
-                .map {
-                    TopMovieDto(
-                        tmdbId = it.tmdbId,
-                        title = it.title,
-                        releaseYear = it.releaseYear,
-                        posterPath = it.posterPath,
-                        averageScore = it.scoreSum / it.count,
-                        ratingsCount = it.count,
-                        direccion = it.direccionSum / it.count,
-                        fotografia = it.fotografiaSum / it.count,
-                        actuacion = it.actuacionSum / it.count,
-                        bandaSonora = it.bandaSonoraSum / it.count,
-                        guion = it.guionSum / it.count
-                    )
-                }
-                .sortedByDescending { it.averageScore }
-
-            if (safeLimit != null) sorted.take(safeLimit) else sorted
+        val filtered = if (year != null) {
+            movies.filter { it.releaseYear == year }
+        } else {
+            movies
         }
-    }
-}
 
-private data class TopAccumulator(
-    val tmdbId: Int,
-    val title: String,
-    val releaseYear: Int?,
-    val posterPath: String?
-) {
-    var scoreSum: Double = 0.0
-    var direccionSum: Double = 0.0
-    var fotografiaSum: Double = 0.0
-    var actuacionSum: Double = 0.0
-    var bandaSonoraSum: Double = 0.0
-    var guionSum: Double = 0.0
-    var count: Int = 0
+        val results = filtered
+            .filter { it.ratings.isNotEmpty() }
+            .map { movie ->
+                val ratings = movie.ratings
+                val count = ratings.size
+
+                val avgScore = ratings.map { rating ->
+                    (rating.direccion + rating.fotografia + rating.actuacion + rating.bandaSonora + rating.guion) / 5.0
+                }.average()
+
+                val avgDireccion = ratings.map { it.direccion }.average()
+                val avgFotografia = ratings.map { it.fotografia }.average()
+                val avgActuacion = ratings.map { it.actuacion }.average()
+                val avgBandaSonora = ratings.map { it.bandaSonora }.average()
+                val avgGuion = ratings.map { it.guion }.average()
+
+                TopMovieDto(
+                    tmdbId = movie.tmdbId,
+                    title = movie.title,
+                    releaseYear = movie.releaseYear,
+                    posterPath = movie.posterPath,
+                    averageScore = avgScore,
+                    ratingsCount = count,
+                    direccion = avgDireccion,
+                    fotografia = avgFotografia,
+                    actuacion = avgActuacion,
+                    bandaSonora = avgBandaSonora,
+                    guion = avgGuion
+                )
+            }
+            .sortedByDescending { it.averageScore }
+
+        return if (safeLimit != null) results.take(safeLimit) else results
+    }
 }

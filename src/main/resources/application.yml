@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: raterr
+  datasource:
+    url: jdbc:sqlite:${SQLITE_DB_PATH:raterr.db}
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: main
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /
+
+raterr:
+  tmdb:
+    api-key: ${TMDB_API_KEY:}
+    base-url: https://api.themoviedb.org/3
+
+logging:
+  level:
+    root: INFO
+    org.example: DEBUG
+    org.hibernate.SQL: DEBUG
