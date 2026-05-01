@@ -30,7 +30,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>org.example.RaterrApplicationKt</mainClass>
+                    <mainClass>org.raterr.RaterrApplicationKt</mainClass>
                 </configuration>
             </plugin>
             <plugin>
