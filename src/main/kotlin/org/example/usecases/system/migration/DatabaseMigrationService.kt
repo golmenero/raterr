@@ -5,7 +5,8 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.core.annotation.Order
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.Instant
 import jakarta.persistence.EntityManager
 import java.io.BufferedReader
@@ -17,24 +18,28 @@ import java.nio.charset.StandardCharsets
 class DatabaseMigrationService(
     private val migrationRepository: MigrationRepository,
     private val resourceLoader: ResourceLoader,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
+    private val transactionManager: PlatformTransactionManager
 ) : CommandLineRunner {
 
     private val logger = LoggerFactory.getLogger(DatabaseMigrationService::class.java)
     private val migrationPath = "classpath:db/migration/"
+    private val transactionTemplate = TransactionTemplate(transactionManager)
 
     override fun run(vararg args: String) {
         logger.info("Starting database migrations...")
         
-        runV1Migration()
-        registerAllMigrations()
-        executePendingMigrations()
+        transactionTemplate.execute {
+            runV1Migration()
+            registerAllMigrations()
+            executePendingMigrations()
+            null
+        }
         
         logger.info("Database migrations completed")
     }
 
-    @Transactional
-    fun runV1Migration() {
+    private fun runV1Migration() {
         val tableExists = entityManager.createNativeQuery(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='migrations'"
         ).resultList.isNotEmpty()
@@ -49,8 +54,7 @@ class DatabaseMigrationService(
         }
     }
 
-    @Transactional
-    fun registerAllMigrations() {
+    private fun registerAllMigrations() {
         val migrations = loadAvailableMigrations()
         
         migrations.forEach { migrationName ->
@@ -62,8 +66,7 @@ class DatabaseMigrationService(
         }
     }
 
-    @Transactional
-    fun executePendingMigrations() {
+    private fun executePendingMigrations() {
         val pendingMigrations = migrationRepository.findByExecuted(0)
             .filter { it.name != "V1__initial_schema.sql" }
 
