@@ -11,6 +11,16 @@ class ViewController {
         return "index"
     }
 
+    @GetMapping("/login")
+    fun login(): String {
+        return "login"
+    }
+
+    @GetMapping("/register")
+    fun register(): String {
+        return "register"
+    }
+
     @GetMapping("/rate")
     fun rate(): String {
         return "rate"

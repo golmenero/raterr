@@ -2,9 +2,23 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <header class="site-header" th:fragment="nav(active)">
-    <a class="nav-link" th:classappend="${active == 'search'} ? 'active'" href="/">Search</a>
-    <span class="nav-monogram" aria-hidden="true">R</span>
-    <a class="nav-link" th:classappend="${active == 'top'} ? 'active'" href="/top">Tops</a>
+    <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
+       class="nav-link" th:classappend="${active == 'search'} ? 'active'" href="/">Search</a>
+    <span class="nav-monogram" aria-hidden="true" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">R</span>
+    <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
+       class="nav-link" th:classappend="${active == 'top'} ? 'active'" href="/top">Tops</a>
+    
+    <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
+        <span class="user-info">
+            <span class="username" th:text="${#authentication.name}">User</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; padding: 12px 24px; color: var(--text-soft); font-weight: 600; font-family: var(--font-ui);">Logout</button>
+            </form>
+        </span>
+    </div>
+    
+    <a th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
+       class="nav-monogram nav-monogram-link" aria-hidden="true" href="/login">R</a>
 </header>
 </body>
 </html>
