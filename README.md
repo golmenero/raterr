@@ -37,8 +37,8 @@ mvn clean compile exec:java
 ```
 
 Open in browser:
-- `http://localhost:8080/index.html`
-- `http://localhost:8080/top.html`
+- `http://localhost:8080/`
+- `http://localhost:8080/top`
 
 ## Docker
 
@@ -80,15 +80,15 @@ The SQLite database is persisted in the Docker volume `raterr_data`.
 - `DELETE /api/movie/{id}/rating`
 - `GET /api/tops?year=2024` (without `limit` returns all)
 
-Example payload for `POST /api/ratings`:
+Example payload for `POST /api/rate`:
 ```json
 {
   "tmdbId": 603,
-  "direccion": 9,
-  "fotografia": 8,
-  "actuacion": 9,
-  "bandaSonora": 8,
-  "guion": 9
+  "directing": 9,
+  "cinematography": 8,
+  "acting": 9,
+  "soundtrack": 8,
+  "screenplay": 9
 }
 ```
 

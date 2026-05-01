@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raterr - Tops</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="page-shell">
+    <header class="site-header" th:replace="~{fragments/nav :: nav(active='top')}"></header>
+
+    <main class="main-stack">
+        <section class="hero-card">
+            <div class="hero-content">
+                <div>
+                    <h1 class="hero-title">Review your best movies at a glance.</h1>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div class="heading-filter">
+                    <input id="year" type="number" min="1900" max="2100" placeholder="Year" aria-label="Filter by year">
+                    <button class="primary-button icon-button icon-only-button" type="button" onclick="loadTops()" aria-label="Refresh ranking">
+                        <span class="button-icon" aria-hidden="true">↻</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="msg" class="feedback hidden spacer-top"></div>
+            <div id="list" class="top-list spacer-top"></div>
+        </section>
+    </main>
+</div>
+
+<script type="module" src="/js/top.js"></script>
+</body>
+</html>
