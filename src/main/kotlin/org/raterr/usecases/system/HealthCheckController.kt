@@ -1,4 +1,4 @@
-package org.raterr.usecases.system.health
+package org.raterr.usecases.system
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping

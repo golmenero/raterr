@@ -1,4 +1,4 @@
-package org.raterr.usecases.movie.search
+package org.raterr.usecases.movie
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbMovie

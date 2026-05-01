@@ -1,4 +1,4 @@
-package org.raterr.usecases.top.list
+package org.raterr.usecases.top
 
 import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.RatingRepository

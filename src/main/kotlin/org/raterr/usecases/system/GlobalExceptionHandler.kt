@@ -1,4 +1,4 @@
-package org.raterr.usecases.system.exception
+package org.raterr.usecases.system
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,4 +1,4 @@
-package org.raterr.usecases.movie.details
+package org.raterr.usecases.movie
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbMovie
@@ -93,14 +93,14 @@ class GetMovieDetailsController(
 
     private fun calculateStats(ratings: List<Rating>): ScoreStats {
         if (ratings.isEmpty()) {
-            return ScoreStats(averageScore = 0.0, ratingsCount = 0)
+            return _root_ide_package_.org.raterr.usecases.movie.ScoreStats(averageScore = 0.0, ratingsCount = 0)
         }
 
         val avg = ratings.map { rating ->
             (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
         }.average()
 
-        return ScoreStats(averageScore = avg, ratingsCount = ratings.size)
+        return _root_ide_package_.org.raterr.usecases.movie.ScoreStats(averageScore = avg, ratingsCount = ratings.size)
     }
 }
 
