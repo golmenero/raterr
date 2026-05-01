@@ -1,6 +1,7 @@
 package org.raterr.usecases.user
 
 import org.raterr.security.CustomUserDetailsService
+import org.raterr.usecases.rating.RatingRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -13,7 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 class RegisterController(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val userDetailsService: CustomUserDetailsService
+    private val userDetailsService: CustomUserDetailsService,
+    private val ratingRepository: RatingRepository
 ) {
 
     @GetMapping("/register")
@@ -62,6 +64,11 @@ class RegisterController(
         )
 
         userRepository.save(user)
+
+        val ratingsWithoutUser = ratingRepository.findAll().filter { it.user == null }
+        ratingsWithoutUser.forEach { rating ->
+            ratingRepository.save(rating.copy(user = user))
+        }
 
         return "redirect:/login"
     }
