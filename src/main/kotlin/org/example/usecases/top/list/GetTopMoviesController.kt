@@ -1,17 +1,32 @@
-package org.example.service
+package org.example.usecases.top.list
 
-import org.example.model.dto.TopMovieDto
-import org.example.repository.MovieRepository
-import org.springframework.stereotype.Service
+import org.example.usecases.movie.MovieRepository
+import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
-@Service
-class TopService(
+@RestController
+class GetTopMoviesController(
     private val movieRepository: MovieRepository
 ) {
 
+    @GetMapping("/api/tops")
     @Transactional(readOnly = true)
-    fun getTop(limit: Int?, year: Int?): List<TopMovieDto> {
+    fun getTops(
+        @RequestParam("limit", required = false) limit: Int?,
+        @RequestParam("year", required = false) year: Int?
+    ): ResponseEntity<List<GetTopMoviesResponse>> {
+        return try {
+            val tops = getTopMovies(limit, year)
+            ResponseEntity.ok(tops)
+        } catch (e: Exception) {
+            ResponseEntity.internalServerError().build()
+        }
+    }
+
+    private fun getTopMovies(limit: Int?, year: Int?): List<GetTopMoviesResponse> {
         val safeLimit = limit?.coerceIn(1, 100)
 
         val movies = movieRepository.findAllWithRatings()
@@ -38,7 +53,7 @@ class TopService(
                 val avgBandaSonora = ratings.map { it.bandaSonora }.average()
                 val avgGuion = ratings.map { it.guion }.average()
 
-                TopMovieDto(
+                GetTopMoviesResponse(
                     tmdbId = movie.tmdbId,
                     title = movie.title,
                     releaseYear = movie.releaseYear,
@@ -57,3 +72,17 @@ class TopService(
         return if (safeLimit != null) results.take(safeLimit) else results
     }
 }
+
+data class GetTopMoviesResponse(
+    val tmdbId: Int,
+    val title: String,
+    val releaseYear: Int?,
+    val posterPath: String?,
+    val averageScore: Double,
+    val ratingsCount: Int,
+    val direccion: Double = 0.0,
+    val fotografia: Double = 0.0,
+    val actuacion: Double = 0.0,
+    val bandaSonora: Double = 0.0,
+    val guion: Double = 0.0
+)

@@ -1,12 +1,13 @@
-package org.example.exception
+package org.example.usecases.system.exception
 
-import org.example.model.dto.ApiError
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import java.util.NoSuchElementException
+
+data class ApiError(val message: String)
 
 @ControllerAdvice
 class GlobalExceptionHandler {

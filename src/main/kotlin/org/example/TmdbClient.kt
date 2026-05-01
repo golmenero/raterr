@@ -1,13 +1,12 @@
-package org.example.tmdb
+package org.example
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
 
-@Service
+@Component
 class TmdbClient(
     @Value("\${raterr.tmdb.api-key}")
     private val apiKey: String,
@@ -19,7 +18,7 @@ class TmdbClient(
         .baseUrl(baseUrl)
         .build()
 
-    suspend fun searchMovies(query: String): List<TmdbMovie> {
+    fun searchMovies(query: String): List<TmdbMovie> {
         if (query.isBlank()) return emptyList()
         requireApiKey()
 
@@ -35,12 +34,12 @@ class TmdbClient(
             }
             .retrieve()
             .bodyToMono(TmdbSearchResponse::class.java)
-            .toFuture()
-            .await()
-            .results
+            .block()
+            ?.results
+            ?: emptyList()
     }
 
-    suspend fun movieDetails(tmdbId: Int): TmdbMovie {
+    fun movieDetails(tmdbId: Int): TmdbMovie {
         requireApiKey()
 
         return webClient.get()
@@ -52,8 +51,8 @@ class TmdbClient(
             }
             .retrieve()
             .bodyToMono(TmdbMovie::class.java)
-            .toFuture()
-            .await()
+            .block()
+            ?: throw RuntimeException("No se pudo obtener detalles de la pelicula")
     }
 
     private fun requireApiKey() {

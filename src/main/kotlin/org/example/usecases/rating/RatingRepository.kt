@@ -1,7 +1,6 @@
-package org.example.repository
+package org.example.usecases.rating
 
-import org.example.model.entity.Movie
-import org.example.model.entity.Rating
+import org.example.usecases.movie.Movie
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository

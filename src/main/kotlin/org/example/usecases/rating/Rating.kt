@@ -1,6 +1,7 @@
-package org.example.model.entity
+package org.example.usecases.rating
 
 import jakarta.persistence.*
+import org.example.usecases.movie.Movie
 
 @Entity
 @Table(name = "rating")
