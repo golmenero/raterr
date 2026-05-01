@@ -2,7 +2,6 @@ package org.raterr.usecases.movie
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbMovie
-import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
 import org.springframework.stereotype.Controller
@@ -56,20 +55,20 @@ class SearchMoviesController(
         )
     }
 
-    private fun calculateStats(ratings: List<Rating>): ScoreStats {
+    private fun calculateStats(ratings: List<Rating>): SearchMoviesScoreStats {
         if (ratings.isEmpty()) {
-            return ScoreStats(averageScore = 0.0, ratingsCount = 0)
+            return SearchMoviesScoreStats(averageScore = 0.0, ratingsCount = 0)
         }
 
         val avg = ratings.map { rating ->
             (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
         }.average()
 
-        return ScoreStats(averageScore = avg, ratingsCount = ratings.size)
+        return SearchMoviesScoreStats(averageScore = avg, ratingsCount = ratings.size)
     }
 }
 
-private data class ScoreStats(
+data class SearchMoviesScoreStats(
     val averageScore: Double,
     val ratingsCount: Int
 )
