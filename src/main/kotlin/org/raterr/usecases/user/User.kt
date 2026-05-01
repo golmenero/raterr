@@ -8,11 +8,7 @@ import java.time.Instant
 @Table(name = "users")
 data class User(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    val id: Int? = null,
-
-    @Column(name = "username", unique = true, nullable = false, length = 50)
+    @Column(name = "username", length = 50)
     val username: String,
 
     @Column(name = "email", unique = true, nullable = false, length = 255)

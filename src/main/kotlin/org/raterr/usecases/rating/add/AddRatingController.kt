@@ -10,8 +10,10 @@ import org.raterr.usecases.movie.Movie
 import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
+import org.raterr.usecases.user.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -23,7 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 class AddRatingController(
     private val tmdbClient: TmdbClient,
     private val movieRepository: MovieRepository,
-    private val ratingRepository: RatingRepository
+    private val ratingRepository: RatingRepository,
+    private val userRepository: UserRepository
 ) {
 
     @PostMapping("/rate")
@@ -41,16 +44,22 @@ class AddRatingController(
     }
 
     private fun addRating(request: AddRatingRequest): AddRatingResponse {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        val user = userRepository.findById(username)
+            .orElseThrow { IllegalArgumentException("User not found") }
+
         val movie = movieRepository.findByTmdbId(request.tmdbId).orElse(null)
             ?: upsertMovie(tmdbClient.movieDetails(request.tmdbId))
 
-        val existingRating = ratingRepository.findByMovie(movie).firstOrNull()
+        val existingRating = ratingRepository.findByMovieAndUser(movie, user).firstOrNull()
         require(existingRating == null) {
             "Rating already exists for this movie. Delete it from Tops before creating another."
         }
 
         val newRating = Rating(
             movie = movie,
+            user = user,
             directing = request.directing,
             cinematography = request.cinematography,
             acting = request.acting,
