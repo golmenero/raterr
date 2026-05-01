@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties(prefix = "raterr")
 data class AppConfig(
-    val tmdb: TmdbConfig = TmdbConfig()
+    var tmdb: TmdbConfig = TmdbConfig()
 ) {
     data class TmdbConfig(
-        val apiKey: String = ""
+        var apiKey: String = ""
     )
 }

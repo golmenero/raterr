@@ -13,5 +13,5 @@ ENV SQLITE_DB_PATH=/data/raterr.db
 EXPOSE 8080
 VOLUME ["/data"]
 
-CMD ["mvn", "-DskipTests", "compile", "exec:java"]
+CMD ["mvn", "-DskipTests", "spring-boot:run"]
 

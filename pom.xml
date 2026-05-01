@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.3.10</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <build>
@@ -30,7 +30,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>org.example.RaterrApplication</mainClass>
+                    <mainClass>org.example.RaterrApplicationKt</mainClass>
                 </configuration>
             </plugin>
             <plugin>
