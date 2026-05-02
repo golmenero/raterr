@@ -889,6 +889,54 @@ input[type="range"] {
     margin-top: 8px;
 }
 
+.category-ratings {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+
+.top-card:hover .category-ratings {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.category-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.category-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-soft);
+    font-family: var(--font-ui);
+}
+
+.category-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
+}
+
+.category-score {
+    font-weight: 700;
+    color: hsl(20 78% 86%);
+    font-family: var(--font-ui);
+    min-width: 36px;
+    text-align: right;
+}
+
 
 .top-actions {
     display: flex;
