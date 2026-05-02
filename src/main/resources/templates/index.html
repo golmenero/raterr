@@ -48,8 +48,8 @@
                             <span class="tag" th:text="${m.releaseYear != null} ? ${m.releaseYear} : 'Unknown year'">Year</span>
                             <span th:if="${m.ratingsCount > 0}" class="result-rating-inline">
                                 <span th:each="i : ${#numbers.sequence(1, 5)}">
-                                    <span th:if="${i <= #numbers.floor(m.averageScore / 2)}">★</span>
-                                    <span th:unless="${i <= #numbers.floor(m.averageScore / 2)}">☆</span>
+                                    <span th:if="${i <= (m.averageScore / 2).intValue()}">★</span>
+                                    <span th:unless="${i <= (m.averageScore / 2).intValue()}">☆</span>
                                 </span>
                             </span>
                         </div>
