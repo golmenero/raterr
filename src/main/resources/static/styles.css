@@ -547,8 +547,11 @@ button:disabled {
 
 .result-card-link {
     display: block;
+    position: absolute;
+    inset: 0;
     text-decoration: none;
     color: inherit;
+    z-index: 1;
 }
 
 .result-card-link:focus-visible {
@@ -564,6 +567,7 @@ button:disabled {
     overflow: hidden;
     display: grid;
     grid-template-rows: 220px 1fr;
+    position: relative;
 }
 
 .poster-frame {
