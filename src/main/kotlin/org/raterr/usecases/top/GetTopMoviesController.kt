@@ -1,7 +1,8 @@
 package org.raterr.usecases.top
 
-import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.RatingRepository
+import org.raterr.usecases.user.UserRepository
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -9,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 class GetTopMoviesController(
-    private val movieRepository: MovieRepository,
-    private val ratingRepository: RatingRepository
+    private val ratingRepository: RatingRepository,
+    private val userRepository: UserRepository
 ) {
 
     @GetMapping("/top")
@@ -31,20 +32,24 @@ class GetTopMoviesController(
     }
 
     private fun getTopMovies(limit: Int?, year: Int?): List<GetTopMoviesResponse> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        val user = userRepository.findById(username).orElse(null)
+            ?: return emptyList()
+
         val safeLimit = limit?.coerceIn(1, 100)
 
-        val movies = movieRepository.findAllWithRatings()
+        val ratings = ratingRepository.findByUser(user)
 
         val filtered = if (year != null) {
-            movies.filter { it.releaseYear == year }
+            ratings.filter { it.movie.releaseYear == year }
         } else {
-            movies
+            ratings
         }
 
         val results = filtered
-            .filter { it.ratings.isNotEmpty() }
-            .map { movie ->
-                val ratings = movie.ratings
+            .groupBy { it.movie }
+            .map { (movie, ratings) ->
                 val count = ratings.size
 
                 val individualScores = ratings.map { rating ->

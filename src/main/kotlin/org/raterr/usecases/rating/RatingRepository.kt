@@ -10,10 +10,14 @@ import org.springframework.stereotype.Repository
 interface RatingRepository : JpaRepository<Rating, Int> {
     fun findByMovie(movie: Movie): List<Rating>
     fun findByMovieAndUser(movie: Movie, user: User): List<Rating>
+    fun findByUser(user: User): List<Rating>
     
     @Query("SELECT r FROM Rating r JOIN r.movie m WHERE m.tmdbId = :tmdbId")
     fun findByMovieTmdbId(tmdbId: Int): List<Rating>
     
     @Query("DELETE FROM Rating r WHERE r.movie.tmdbId = :tmdbId")
     fun deleteByMovieTmdbId(tmdbId: Int): Int
+    
+    @Query("DELETE FROM Rating r WHERE r.movie.tmdbId = :tmdbId AND r.user.username = :username")
+    fun deleteByMovieTmdbIdAndUsername(tmdbId: Int, username: String): Int
 }

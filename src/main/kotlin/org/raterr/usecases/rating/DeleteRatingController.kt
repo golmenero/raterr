@@ -1,6 +1,6 @@
 package org.raterr.usecases.rating
 
-import org.raterr.usecases.movie.MovieRepository
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -9,8 +9,7 @@ import java.util.NoSuchElementException
 
 @Controller
 class DeleteRatingController(
-    private val movieRepository: MovieRepository,
-    private val ratingRepository: RatingRepository
+    private val ratingRepository: RatingRepository,
 ) {
 
     @PostMapping("/top/delete/{id}")
@@ -19,10 +18,10 @@ class DeleteRatingController(
         redirectAttributes: RedirectAttributes
     ): String {
         return try {
-            val movie = movieRepository.findByIdWithRatings(tmdbId)
-                .orElseThrow { NoSuchElementException("Movie not found") }
-
-            val deletedCount = ratingRepository.deleteByMovieTmdbId(movie.tmdbId)
+            val authentication = SecurityContextHolder.getContext().authentication
+            val username = authentication.name
+            
+            val deletedCount = ratingRepository.deleteByMovieTmdbIdAndUsername(tmdbId, username)
 
             if (deletedCount == 0) {
                 throw NoSuchElementException("Rating not found")
