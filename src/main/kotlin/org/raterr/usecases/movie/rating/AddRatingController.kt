@@ -19,7 +19,7 @@ class AddRatingController(
     private val userRepository: UserRepository
 ) {
 
-    @PostMapping("/rate")
+    @PostMapping("/movie/rate")
     fun saveRating(
         @RequestParam("tmdbId") tmdbId: Int,
         @RequestParam("directing") directing: Double,

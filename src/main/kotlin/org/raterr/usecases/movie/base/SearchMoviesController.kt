@@ -16,7 +16,7 @@ class SearchMoviesController(
     private val ratingRepository: RatingRepository
 ) {
 
-    @GetMapping("/")
+    @GetMapping("/movie")
     fun searchPage(@RequestParam("q", required = false) query: String?, model: Model): String {
         if (!query.isNullOrBlank()) {
             val results = searchAndCacheMovies(query)

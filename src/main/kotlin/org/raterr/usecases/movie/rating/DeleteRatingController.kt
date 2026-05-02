@@ -13,7 +13,7 @@ class DeleteRatingController(
     private val ratingRepository: RatingRepository
 ) {
 
-    @PostMapping("/top/delete/{id}")
+    @PostMapping("/movie/top/delete/{id}")
     @Transactional
     fun deleteRating(
         @PathVariable("id") tmdbId: Int,

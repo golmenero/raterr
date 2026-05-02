@@ -12,7 +12,7 @@ class SearchSuggestionsController(
     private val tmdbClient: TmdbClient
 ) {
 
-    @GetMapping("/api/search/suggestions")
+    @GetMapping("/api/movie/search/suggestions")
     fun searchSuggestions(
         @RequestParam("q") query: String,
         @RequestParam("limit", defaultValue = "5") limit: Int

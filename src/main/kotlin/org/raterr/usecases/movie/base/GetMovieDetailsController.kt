@@ -16,7 +16,7 @@ class GetMovieDetailsController(
     private val ratingRepository: RatingRepository
 ) {
 
-    @GetMapping("/rate")
+    @GetMapping("/movie/rate")
     fun ratePage(@RequestParam("id") tmdbId: Int, model: Model): String {
         try {
             val movie = getMovieByTmdbId(tmdbId)

@@ -15,7 +15,7 @@ class GetTopMoviesController(
     private val userRepository: UserRepository
 ) {
 
-    @GetMapping("/top")
+    @GetMapping("/movie/top")
     fun topsPage(
         @RequestParam("limit", required = false) limit: Int?,
         @RequestParam("year", required = false) year: Int?,

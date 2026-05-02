@@ -23,7 +23,7 @@
         <section class="panel">
             <div class="search-toolbar-centered">
                 <div class="heading-filter search-inline">
-                    <form th:action="@{/}" method="get" style="display: contents;">
+                    <form th:action="@{/movie}" method="get" style="display: contents;">
                         <input id="q" name="q" type="text" th:value="${query}" placeholder="Search movie" autocomplete="off" aria-label="Search movie">
                         <button class="primary-button icon-button icon-only-button" type="submit" aria-label="Search" title="Search">
                             <span class="button-icon" aria-hidden="true">
@@ -57,7 +57,7 @@
                         <h3 class="result-title" th:text="${m.title}">Title</h3>
                         <p class="result-overview" th:text="${m.overview != null and m.overview.trim().length() > 0} ? ${m.overview} : 'No synopsis available right now.'">Overview</p>
                     </div>
-                    <a th:if="${m.ratingsCount == 0}" th:href="@{/rate(id=${m.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${m.title}"></a>
+                    <a th:if="${m.ratingsCount == 0}" th:href="@{/movie/rate(id=${m.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${m.title}"></a>
                 </article>
             </div>
             <div th:unless="${movies != null}" id="results" class="results-grid"></div>
