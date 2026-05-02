@@ -1,1 +1,0 @@
-ALTER TABLE ratings ADD COLUMN username INTEGER;

@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS migrations (
 );
 
 CREATE TABLE IF NOT EXISTS movies (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tmdb_id INTEGER UNIQUE NOT NULL,
+    tmdb_id INTEGER PRIMARY KEY NOT NULL,
     title VARCHAR(255) NOT NULL,
     original_title VARCHAR(255),
     overview TEXT,
@@ -19,13 +18,13 @@ CREATE TABLE IF NOT EXISTS movies (
 CREATE TABLE IF NOT EXISTS ratings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     movie_id INTEGER NOT NULL,
+    username INTEGER,
     directing DOUBLE NOT NULL,
     cinematography DOUBLE NOT NULL,
     acting DOUBLE NOT NULL,
     soundtrack DOUBLE NOT NULL,
     screenplay DOUBLE NOT NULL,
     created_at_epoch_ms INTEGER NOT NULL,
-    FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS users (
