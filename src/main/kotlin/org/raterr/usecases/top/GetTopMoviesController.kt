@@ -2,6 +2,7 @@ package org.raterr.usecases.top
 
 import org.raterr.TmdbClient
 import org.raterr.usecases.movie.MovieRepository
+import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
 import org.raterr.usecases.user.UserRepository
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,11 +27,26 @@ class GetTopMoviesController(
         model: Model
     ): String {
         try {
-            val tops = getTopMovies(limit, year, category)
+            val authentication = SecurityContextHolder.getContext().authentication
+            val username = authentication.name
+            val user = userRepository.findById(username).orElse(null)
+            
+            if (user == null) {
+                model.addAttribute("tops", emptyList<GetTopMoviesResponse>())
+                model.addAttribute("selectedYear", year)
+                model.addAttribute("selectedCategory", category)
+                model.addAttribute("availableCategories", emptyList<String>())
+                return "top"
+            }
+            
+            val ratings = ratingRepository.findByUser(user)
+            val tops = getTopMovies(ratings, limit, year, category)
+            val availableCategories = getAvailableCategories(ratings)
+            
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
             model.addAttribute("selectedCategory", category)
-            model.addAttribute("availableCategories", getAvailableCategories())
+            model.addAttribute("availableCategories", availableCategories)
             return "top"
         } catch (e: Exception) {
             model.addAttribute("error", "Could not load the tops.")
@@ -38,15 +54,8 @@ class GetTopMoviesController(
         }
     }
 
-    private fun getTopMovies(limit: Int?, year: Int?, category: String?): List<GetTopMoviesResponse> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val username = authentication.name
-        val user = userRepository.findById(username).orElse(null)
-            ?: return emptyList()
-
+    private fun getTopMovies(ratings: List<Rating>, limit: Int?, year: Int?, category: String?): List<GetTopMoviesResponse> {
         val safeLimit = limit?.coerceIn(1, 100)
-
-        val ratings = ratingRepository.findByUser(user)
 
         var filtered = if (year != null) {
             ratings.filter { it.movie.releaseYear == year }
@@ -95,14 +104,8 @@ class GetTopMoviesController(
         return if (safeLimit != null) results.take(safeLimit) else results
     }
 
-    private fun getAvailableCategories(): List<String> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        val username = authentication.name
-        val user = userRepository.findById(username).orElse(null)
-            ?: return emptyList()
-
-        val updatedRatings = ratingRepository.findByUser(user)
-        return updatedRatings
+    private fun getAvailableCategories(ratings: List<Rating>): List<String> {
+        return ratings
             .mapNotNull { it.movie.genres }
             .flatMap { it.split(",").map { genre -> genre.trim() } }
             .filter { it.isNotBlank() }

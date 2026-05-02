@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository
 interface RatingRepository : JpaRepository<Rating, Int> {
     fun findByMovie(movie: Movie): List<Rating>
     fun findByMovieAndUser(movie: Movie, user: User): List<Rating>
+    
+    @Query("SELECT r FROM Rating r JOIN FETCH r.movie WHERE r.user = :user")
     fun findByUser(user: User): List<Rating>
     
     @Query("SELECT r FROM Rating r JOIN r.movie m WHERE m.tmdbId = :tmdbId")
