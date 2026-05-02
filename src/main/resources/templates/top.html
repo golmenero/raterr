@@ -26,7 +26,25 @@
                     <form th:action="@{/top}" method="get" style="display: contents;">
                         <select id="category" name="category" aria-label="Filter by category">
                             <option value="">All categories</option>
-                            <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}" th:selected="${selectedCategory == cat}">Category</option>
+                            <option value="Action" th:selected="${selectedCategory == 'Action'}">Action</option>
+                            <option value="Adventure" th:selected="${selectedCategory == 'Adventure'}">Adventure</option>
+                            <option value="Animation" th:selected="${selectedCategory == 'Animation'}">Animation</option>
+                            <option value="Comedy" th:selected="${selectedCategory == 'Comedy'}">Comedy</option>
+                            <option value="Crime" th:selected="${selectedCategory == 'Crime'}">Crime</option>
+                            <option value="Documentary" th:selected="${selectedCategory == 'Documentary'}">Documentary</option>
+                            <option value="Drama" th:selected="${selectedCategory == 'Drama'}">Drama</option>
+                            <option value="Family" th:selected="${selectedCategory == 'Family'}">Family</option>
+                            <option value="Fantasy" th:selected="${selectedCategory == 'Fantasy'}">Fantasy</option>
+                            <option value="History" th:selected="${selectedCategory == 'History'}">History</option>
+                            <option value="Horror" th:selected="${selectedCategory == 'Horror'}">Horror</option>
+                            <option value="Music" th:selected="${selectedCategory == 'Music'}">Music</option>
+                            <option value="Mystery" th:selected="${selectedCategory == 'Mystery'}">Mystery</option>
+                            <option value="Romance" th:selected="${selectedCategory == 'Romance'}">Romance</option>
+                            <option value="Science Fiction" th:selected="${selectedCategory == 'Science Fiction'}">Science Fiction</option>
+                            <option value="Thriller" th:selected="${selectedCategory == 'Thriller'}">Thriller</option>
+                            <option value="TV Movie" th:selected="${selectedCategory == 'TV Movie'}">TV Movie</option>
+                            <option value="War" th:selected="${selectedCategory == 'War'}">War</option>
+                            <option value="Western" th:selected="${selectedCategory == 'Western'}">Western</option>
                         </select>
                         <input id="year" name="year" type="number" min="1900" max="2100" th:value="${selectedYear}" placeholder="Year" aria-label="Filter by year">
                         <button class="primary-button icon-button icon-only-button" type="submit" aria-label="Refresh ranking">

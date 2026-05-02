@@ -45,6 +45,7 @@ class GetMovieDetailsController(
 
     private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
         val existing = movieRepository.findById(tmdbMovie.id).orElse(null)
+        val genres = tmdbMovie.genres.joinToString(",") { it.name }
 
         return if (existing != null) {
             val updated = existing.copy(
@@ -54,7 +55,8 @@ class GetMovieDetailsController(
                 releaseDate = tmdbMovie.releaseDate,
                 releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
                 posterPath = tmdbMovie.posterPath,
-                tmdbVoteAverage = tmdbMovie.voteAverage
+                tmdbVoteAverage = tmdbMovie.voteAverage,
+                genres = genres
             )
             movieRepository.save(updated)
         } else {
@@ -66,7 +68,8 @@ class GetMovieDetailsController(
                 releaseDate = tmdbMovie.releaseDate,
                 releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
                 posterPath = tmdbMovie.posterPath,
-                tmdbVoteAverage = tmdbMovie.voteAverage
+                tmdbVoteAverage = tmdbMovie.voteAverage,
+                genres = genres
             )
             movieRepository.save(newMovie)
         }

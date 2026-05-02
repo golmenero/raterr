@@ -1,7 +1,5 @@
 package org.raterr.usecases.top
 
-import org.raterr.TmdbClient
-import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.Rating
 import org.raterr.usecases.rating.RatingRepository
 import org.raterr.usecases.user.UserRepository
@@ -14,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam
 @Controller
 class GetTopMoviesController(
     private val ratingRepository: RatingRepository,
-    private val userRepository: UserRepository,
-    private val tmdbClient: TmdbClient,
-    private val movieRepository: MovieRepository
+    private val userRepository: UserRepository
 ) {
 
     @GetMapping("/top")
@@ -41,12 +37,10 @@ class GetTopMoviesController(
             
             val ratings = ratingRepository.findByUser(user)
             val tops = getTopMovies(ratings, limit, year, category)
-            val availableCategories = getAvailableCategories(ratings)
             
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
             model.addAttribute("selectedCategory", category)
-            model.addAttribute("availableCategories", availableCategories)
             return "top"
         } catch (e: Exception) {
             model.addAttribute("error", "Could not load the tops.")
@@ -102,15 +96,6 @@ class GetTopMoviesController(
             .sortedByDescending { it.averageScore }
 
         return if (safeLimit != null) results.take(safeLimit) else results
-    }
-
-    private fun getAvailableCategories(ratings: List<Rating>): List<String> {
-        return ratings
-            .mapNotNull { it.movie.genres }
-            .flatMap { it.split(",").map { genre -> genre.trim() } }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .sorted()
     }
 }
 
