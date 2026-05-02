@@ -22,7 +22,7 @@ class DeleteRatingController(
             val movie = movieRepository.findByIdWithRatings(tmdbId)
                 .orElseThrow { NoSuchElementException("Movie not found") }
 
-            val deletedCount = ratingRepository.deleteByMovieId(movie.tmdbId)
+            val deletedCount = ratingRepository.deleteByMovieTmdbId(movie.tmdbId)
 
             if (deletedCount == 0) {
                 throw NoSuchElementException("Rating not found")
