@@ -9,7 +9,7 @@ import java.util.NoSuchElementException
 
 @Controller
 class DeleteRatingController(
-    private val ratingRepository: RatingRepository,
+    private val ratingRepository: RatingRepository
 ) {
 
     @PostMapping("/top/delete/{id}")
