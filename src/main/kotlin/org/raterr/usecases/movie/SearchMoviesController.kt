@@ -34,7 +34,7 @@ class SearchMoviesController(
     }
 
     private fun buildResponseFromTmdb(tmdbMovie: TmdbMovie): SearchMoviesResponse {
-        val movie = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
+        val movie = movieRepository.findById(tmdbMovie.id).orElse(null)
         val ratings = if (movie != null) {
             ratingRepository.findByMovie(movie)
         } else {

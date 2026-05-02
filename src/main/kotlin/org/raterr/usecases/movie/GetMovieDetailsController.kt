@@ -33,7 +33,7 @@ class GetMovieDetailsController(
     }
 
     private fun getMovieByTmdbId(tmdbId: Int): GetMovieDetailsResponse {
-        val localMovie = movieRepository.findByTmdbId(tmdbId).orElse(null)
+        val localMovie = movieRepository.findById(tmdbId).orElse(null)
 
         val movie = localMovie ?: run {
             val tmdbMovie = tmdbClient.movieDetails(tmdbId)
@@ -44,7 +44,7 @@ class GetMovieDetailsController(
     }
 
     private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
-        val existing = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
+        val existing = movieRepository.findById(tmdbMovie.id).orElse(null)
 
         return if (existing != null) {
             val updated = existing.copy(

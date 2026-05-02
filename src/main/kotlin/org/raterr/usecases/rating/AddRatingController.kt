@@ -45,7 +45,7 @@ class AddRatingController(
             val user = userRepository.findById(username)
                 .orElseThrow { IllegalArgumentException("User not found") }
 
-            val movie = movieRepository.findByTmdbId(tmdbId).orElse(null)
+            val movie = movieRepository.findById(tmdbId).orElse(null)
                 ?: upsertMovie(tmdbClient.movieDetails(tmdbId))
 
             val existingRating = ratingRepository.findByMovieAndUser(movie, user).firstOrNull()
@@ -81,7 +81,7 @@ class AddRatingController(
     }
 
     private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
-        val existing = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
+        val existing = movieRepository.findById(tmdbMovie.id).orElse(null)
 
         return if (existing != null) {
             val updated = existing.copy(
