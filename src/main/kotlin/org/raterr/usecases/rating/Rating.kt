@@ -13,7 +13,7 @@ data class Rating(
     val id: Int? = null,
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "movie_id", nullable = false)
+    @JoinColumn(name = "tmdb_id", referencedColumnName = "tmdbId", nullable = false)
     val movie: Movie,
     
     @ManyToOne(fetch = FetchType.LAZY)

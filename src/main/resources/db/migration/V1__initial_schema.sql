@@ -17,14 +17,14 @@ CREATE TABLE IF NOT EXISTS movies (
 
 CREATE TABLE IF NOT EXISTS ratings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    movie_id INTEGER NOT NULL,
+    tmdb_id INTEGER NOT NULL,
     username INTEGER,
     directing DOUBLE NOT NULL,
     cinematography DOUBLE NOT NULL,
     acting DOUBLE NOT NULL,
     soundtrack DOUBLE NOT NULL,
     screenplay DOUBLE NOT NULL,
-    created_at_epoch_ms INTEGER NOT NULL,
+    created_at_epoch_ms INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
