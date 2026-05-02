@@ -48,8 +48,8 @@
                         <h3 class="top-title" th:text="${m.title}">Title</h3>
                         <p class="rating-inline compact-stars">
                             <span th:each="i : ${#numbers.sequence(1, 5)}">
-                                <span th:if="${i <= #numbers.floor(m.averageScore / 2)}">★</span>
-                                <span th:unless="${i <= #numbers.floor(m.averageScore / 2)}">☆</span>
+                                <span th:if="${m.averageScore >= i * 2}">★</span>
+                                <span th:unless="${m.averageScore >= i * 2}">☆</span>
                             </span>
                         </p>
                     </div>
