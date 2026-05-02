@@ -1,5 +1,7 @@
 package org.raterr.usecases.top
 
+import org.raterr.TmdbClient
+import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.rating.RatingRepository
 import org.raterr.usecases.user.UserRepository
 import org.springframework.security.core.context.SecurityContextHolder
@@ -11,19 +13,24 @@ import org.springframework.web.bind.annotation.RequestParam
 @Controller
 class GetTopMoviesController(
     private val ratingRepository: RatingRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val tmdbClient: TmdbClient,
+    private val movieRepository: MovieRepository
 ) {
 
     @GetMapping("/top")
     fun topsPage(
         @RequestParam("limit", required = false) limit: Int?,
         @RequestParam("year", required = false) year: Int?,
+        @RequestParam("category", required = false) category: String?,
         model: Model
     ): String {
         try {
-            val tops = getTopMovies(limit, year)
+            val tops = getTopMovies(limit, year, category)
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
+            model.addAttribute("selectedCategory", category)
+            model.addAttribute("availableCategories", getAvailableCategories())
             return "top"
         } catch (e: Exception) {
             model.addAttribute("error", "Could not load the tops.")
@@ -31,7 +38,7 @@ class GetTopMoviesController(
         }
     }
 
-    private fun getTopMovies(limit: Int?, year: Int?): List<GetTopMoviesResponse> {
+    private fun getTopMovies(limit: Int?, year: Int?, category: String?): List<GetTopMoviesResponse> {
         val authentication = SecurityContextHolder.getContext().authentication
         val username = authentication.name
         val user = userRepository.findById(username).orElse(null)
@@ -41,10 +48,16 @@ class GetTopMoviesController(
 
         val ratings = ratingRepository.findByUser(user)
 
-        val filtered = if (year != null) {
+        var filtered = if (year != null) {
             ratings.filter { it.movie.releaseYear == year }
         } else {
             ratings
+        }
+
+        if (category != null && category.isNotBlank()) {
+            filtered = filtered.filter { rating ->
+                rating.movie.genres?.contains(category, ignoreCase = true) == true
+            }
         }
 
         val results = filtered
@@ -80,6 +93,42 @@ class GetTopMoviesController(
             .sortedByDescending { it.averageScore }
 
         return if (safeLimit != null) results.take(safeLimit) else results
+    }
+
+    private fun getAvailableCategories(): List<String> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val username = authentication.name
+        val user = userRepository.findById(username).orElse(null)
+            ?: return emptyList()
+
+        val ratings = ratingRepository.findByUser(user)
+        ratings.forEach { rating ->
+            if (rating.movie.genres == null || rating.movie.genres.isNullOrBlank()) {
+                fetchAndPersistGenres(rating.movie.tmdbId)
+            }
+        }
+
+        val updatedRatings = ratingRepository.findByUser(user)
+        return updatedRatings
+            .mapNotNull { it.movie.genres }
+            .flatMap { it.split(",").map { genre -> genre.trim() } }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+    }
+
+    private fun fetchAndPersistGenres(tmdbId: Int) {
+        try {
+            val tmdbMovie = tmdbClient.movieDetails(tmdbId)
+            val existingMovie = movieRepository.findById(tmdbId).orElse(null)
+            if (existingMovie != null) {
+                val genres = tmdbMovie.genres.joinToString(",") { it.name }
+                val updated = existingMovie.copy(genres = genres)
+                movieRepository.save(updated)
+            }
+        } catch (e: Exception) {
+            // Silently ignore errors when fetching genres
+        }
     }
 }
 

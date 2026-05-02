@@ -91,7 +91,8 @@ class AddRatingController(
                 releaseDate = tmdbMovie.releaseDate,
                 releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
                 posterPath = tmdbMovie.posterPath,
-                tmdbVoteAverage = tmdbMovie.voteAverage
+                tmdbVoteAverage = tmdbMovie.voteAverage,
+                genres = tmdbMovie.genres.joinToString(",") { it.name }
             )
             movieRepository.save(updated)
         } else {
@@ -103,7 +104,8 @@ class AddRatingController(
                 releaseDate = tmdbMovie.releaseDate,
                 releaseYear = tmdbMovie.releaseDate?.take(4)?.toIntOrNull(),
                 posterPath = tmdbMovie.posterPath,
-                tmdbVoteAverage = tmdbMovie.voteAverage
+                tmdbVoteAverage = tmdbMovie.voteAverage,
+                genres = tmdbMovie.genres.joinToString(",") { it.name }
             )
             movieRepository.save(newMovie)
         }

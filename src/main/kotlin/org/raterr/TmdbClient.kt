@@ -83,5 +83,15 @@ data class TmdbMovie(
     @JsonProperty("poster_path")
     val posterPath: String? = null,
     @JsonProperty("vote_average")
-    val voteAverage: Double? = null
+    val voteAverage: Double? = null,
+    @JsonProperty("genres")
+    val genres: List<TmdbGenre> = emptyList()
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class TmdbGenre(
+    @JsonProperty("id")
+    val id: Int,
+    @JsonProperty("name")
+    val name: String
 )

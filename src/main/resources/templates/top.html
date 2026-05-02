@@ -24,6 +24,10 @@
             <div class="section-heading">
                 <div class="heading-filter">
                     <form th:action="@{/top}" method="get" style="display: contents;">
+                        <select id="category" name="category" aria-label="Filter by category">
+                            <option value="">All categories</option>
+                            <option th:each="cat : ${availableCategories}" th:value="${cat}" th:text="${cat}" th:selected="${selectedCategory == cat}">Category</option>
+                        </select>
                         <input id="year" name="year" type="number" min="1900" max="2100" th:value="${selectedYear}" placeholder="Year" aria-label="Filter by year">
                         <button class="primary-button icon-button icon-only-button" type="submit" aria-label="Refresh ranking">
                             <span class="button-icon" aria-hidden="true">↻</span>

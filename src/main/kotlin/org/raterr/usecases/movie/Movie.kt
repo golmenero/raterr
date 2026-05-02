@@ -31,6 +31,9 @@ data class Movie(
     @Column(name = "tmdb_vote_average")
     val tmdbVoteAverage: Double? = null,
     
+    @Column(name = "genres", length = 500)
+    val genres: String? = null,
+    
     @OneToMany(mappedBy = "movie", cascade = [CascadeType.ALL], orphanRemoval = true)
     val ratings: MutableList<Rating> = mutableListOf()
 )
