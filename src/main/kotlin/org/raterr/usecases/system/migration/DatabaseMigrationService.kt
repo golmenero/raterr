@@ -30,28 +30,12 @@ class DatabaseMigrationService(
         logger.info("Starting database migrations...")
         
         transactionTemplate.execute {
-            runV1Migration()
             registerAllMigrations()
             executePendingMigrations()
             null
         }
         
         logger.info("Database migrations completed")
-    }
-
-    private fun runV1Migration() {
-        val tableExists = entityManager.createNativeQuery(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='migrations'"
-        ).resultList.isNotEmpty()
-
-        if (!tableExists) {
-            logger.info("Executing V1 migration - creating migrations table")
-            val v1Script = loadMigrationScript("V1__initial_schema.sql")
-            executeSqlScript(v1Script)
-            logger.info("V1 migration completed")
-        } else {
-            logger.info("Migrations table already exists, skipping V1")
-        }
     }
 
     private fun registerAllMigrations() {
@@ -68,7 +52,6 @@ class DatabaseMigrationService(
 
     private fun executePendingMigrations() {
         val pendingMigrations = migrationRepository.findByExecuted(0)
-            .filter { it.name != "V1__initial_schema.sql" }
 
         if (pendingMigrations.isEmpty()) {
             logger.info("No pending migrations to execute")
@@ -98,13 +81,23 @@ class DatabaseMigrationService(
 
     private fun loadAvailableMigrations(): List<String> {
         val resource = resourceLoader.getResource(migrationPath)
-        val file = resource.file
         
-        return file.listFiles()
-            ?.filter { it.name.endsWith(".sql") }
-            ?.map { it.name }
-            ?.sorted()
-            ?: emptyList()
+        if (!resource.exists()) {
+            logger.info("No migration directory found at $migrationPath")
+            return emptyList()
+        }
+        
+        return try {
+            val file = resource.file
+            file.listFiles()
+                ?.filter { it.name.endsWith(".sql") }
+                ?.map { it.name }
+                ?.sorted()
+                ?: emptyList()
+        } catch (e: Exception) {
+            logger.info("Cannot access migration directory: ${e.message}")
+            emptyList()
+        }
     }
 
     private fun loadMigrationScript(filename: String): String {
