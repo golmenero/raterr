@@ -189,6 +189,11 @@ input {
     padding: 0;
 }
 
+.nav-toggle-group-right {
+    border-right: none;
+    border-left: 1px solid var(--accent);
+}
+
 .nav-toggle-group .nav-link {
     border: none;
 }

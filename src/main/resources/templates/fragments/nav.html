@@ -16,8 +16,16 @@
     </div>
     <span class="nav-monogram" aria-hidden="true" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">R</span>
     <div class="nav-right">
-        <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
-           class="nav-link" th:classappend="${active == 'top'} ? 'active'" href="/top">TV Shows</a>
+        <div class="nav-toggle-group nav-toggle-group-right">
+            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+               class="nav-link nav-toggle-main" th:classappend="${active == 'top'} ? 'active'" href="/top">
+                <span class="nav-toggle-movies">TV Shows</span>
+            </a>
+            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+               class="nav-link nav-toggle-hidden-link" href="#">Search</a>
+            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+               class="nav-link nav-toggle-hidden-link" href="#">Tops</a>
+        </div>
         <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="nav-link logout-button" aria-label="Logout">
