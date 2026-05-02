@@ -419,8 +419,8 @@ input[type="text"]:focus,
 input[type="number"]:focus,
 input[type="range"]:focus,
 select:focus {
-    border-color: rgba(45, 106, 79, 0.45);
-    box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.12);
+    border-color: rgba(230, 120, 60, 0.45);
+    box-shadow: 0 0 0 4px rgba(230, 120, 60, 0.12);
 }
 
 button,
@@ -1054,8 +1054,8 @@ input[type="range"] {
 }
 
 .form-group input:focus {
-    border-color: rgba(45, 106, 79, 0.45);
-    box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.12);
+    border-color: rgba(230, 120, 60, 0.45);
+    box-shadow: 0 0 0 4px rgba(230, 120, 60, 0.12);
 }
 
 .form-group input::placeholder {
