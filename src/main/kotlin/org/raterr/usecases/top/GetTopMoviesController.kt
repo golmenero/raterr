@@ -47,15 +47,16 @@ class GetTopMoviesController(
                 val ratings = movie.ratings
                 val count = ratings.size
 
-                val avgScore = ratings.map { rating ->
+                val individualScores = ratings.map { rating ->
                     (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
-                }.average()
+                }
 
-                val avgDirecting = ratings.map { it.directing }.average()
-                val avgCinematography = ratings.map { it.cinematography }.average()
-                val avgActing = ratings.map { it.acting }.average()
-                val avgSoundtrack = ratings.map { it.soundtrack }.average()
-                val avgScreenplay = ratings.map { it.screenplay }.average()
+                val avgScore = if (individualScores.isNotEmpty()) individualScores.average() else 0.0
+                val avgDirecting = if (ratings.isNotEmpty()) ratings.map { it.directing }.average() else 0.0
+                val avgCinematography = if (ratings.isNotEmpty()) ratings.map { it.cinematography }.average() else 0.0
+                val avgActing = if (ratings.isNotEmpty()) ratings.map { it.acting }.average() else 0.0
+                val avgSoundtrack = if (ratings.isNotEmpty()) ratings.map { it.soundtrack }.average() else 0.0
+                val avgScreenplay = if (ratings.isNotEmpty()) ratings.map { it.screenplay }.average() else 0.0
 
                 GetTopMoviesResponse(
                     tmdbId = movie.tmdbId,
