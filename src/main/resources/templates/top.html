@@ -54,8 +54,7 @@
                         </p>
                     </div>
                     <div class="top-actions">
-                        <form th:action="@{'/top/delete/' + ${m.tmdbId}}" method="post" style="display: inline;" onsubmit="return confirm('Delete the rating for \'' + ${m.title} + '\'?');">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <form th:action="@{'/top/delete/' + ${m.tmdbId}}" method="post">
                             <button class="top-delete-button" type="submit" aria-label="Delete rating">
                                 <span class="button-icon" aria-hidden="true">🗑</span>
                             </button>
