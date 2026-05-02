@@ -1,6 +1,6 @@
 package org.raterr.usecases.user
 
-import org.raterr.usecases.rating.RatingRepository
+import org.raterr.usecases.movie.rating.RatingRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model

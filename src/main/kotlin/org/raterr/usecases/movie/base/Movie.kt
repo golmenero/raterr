@@ -1,7 +1,7 @@
-package org.raterr.usecases.movie
+package org.raterr.usecases.movie.base
 
 import jakarta.persistence.*
-import org.raterr.usecases.rating.Rating
+import org.raterr.usecases.movie.rating.Rating
 
 @Entity
 @Table(name = "movies")

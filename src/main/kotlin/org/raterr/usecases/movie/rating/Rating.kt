@@ -1,7 +1,7 @@
-package org.raterr.usecases.rating
+package org.raterr.usecases.movie.rating
 
 import jakarta.persistence.*
-import org.raterr.usecases.movie.Movie
+import org.raterr.usecases.movie.base.Movie
 import org.raterr.usecases.user.User
 
 @Entity

@@ -1,4 +1,4 @@
-package org.raterr.usecases.rating
+package org.raterr.usecases.movie.rating
 
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller

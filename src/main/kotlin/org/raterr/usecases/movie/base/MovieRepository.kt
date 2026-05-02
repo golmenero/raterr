@@ -1,4 +1,4 @@
-package org.raterr.usecases.movie
+package org.raterr.usecases.movie.base
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

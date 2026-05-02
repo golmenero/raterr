@@ -1,7 +1,7 @@
-package org.raterr.usecases.top
+package org.raterr.usecases.movie.top
 
-import org.raterr.usecases.rating.Rating
-import org.raterr.usecases.rating.RatingRepository
+import org.raterr.usecases.movie.rating.Rating
+import org.raterr.usecases.movie.rating.RatingRepository
 import org.raterr.usecases.user.UserRepository
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller

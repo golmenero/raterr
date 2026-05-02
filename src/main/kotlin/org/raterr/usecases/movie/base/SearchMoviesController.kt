@@ -1,9 +1,9 @@
-package org.raterr.usecases.movie
+package org.raterr.usecases.movie.base
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbMovie
-import org.raterr.usecases.rating.Rating
-import org.raterr.usecases.rating.RatingRepository
+import org.raterr.usecases.movie.rating.Rating
+import org.raterr.usecases.movie.rating.RatingRepository
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping

@@ -1,7 +1,7 @@
 package org.raterr.usecases.user
 
 import jakarta.persistence.*
-import org.raterr.usecases.rating.Rating
+import org.raterr.usecases.movie.rating.Rating
 import java.time.Instant
 
 @Entity

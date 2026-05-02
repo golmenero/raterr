@@ -1,4 +1,4 @@
-package org.raterr.usecases.movie
+package org.raterr.usecases.movie.base
 
 import org.raterr.TmdbClient
 import org.springframework.http.HttpStatus
