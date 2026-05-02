@@ -51,6 +51,7 @@
                                 <span th:if="${m.averageScore >= i * 2}">★</span>
                                 <span th:unless="${m.averageScore >= i * 2}">☆</span>
                             </span>
+                            <span class="score-value" th:text="${#strings.replace(#numbers.formatDecimal(m.averageScore, 1, 2), ',', '.')}">0.0</span>
                         </p>
                     </div>
                     <div class="top-actions">
