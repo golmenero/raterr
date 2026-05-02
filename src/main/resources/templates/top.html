@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raterr - Tops</title>
     <link rel="stylesheet" href="/styles.css">
+    <script src="/lucide.min.js"></script>
 </head>
 <body>
 <div class="page-shell">
@@ -57,7 +58,7 @@
                     <div class="top-actions">
                         <form th:action="@{'/top/delete/' + ${m.tmdbId}}" method="post">
                             <button class="top-delete-button" type="submit" aria-label="Delete rating">
-                                <span class="button-icon" aria-hidden="true">🗑</span>
+                                <i data-lucide="trash-2" aria-hidden="true"></i>
                             </button>
                         </form>
                     </div>
@@ -68,4 +69,7 @@
     </main>
 </div>
 </body>
+<script>
+    lucide.createIcons();
+</script>
 </html>

@@ -764,6 +764,8 @@ button:disabled {
 .score-icon {
     font-size: 1rem;
     line-height: 1;
+    width: 17px;
+    height: 17px;
 }
 
 .score-value {
@@ -887,6 +889,11 @@ input[type="range"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.top-delete-button i {
+    width: 18px;
+    height: 18px;
 }
 
 .top-delete-button:hover {
@@ -1058,11 +1065,16 @@ input[type="range"] {
     cursor: pointer;
     padding: 8px;
     color: var(--text-soft);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     box-shadow: none !important;
     background-image: none !important;
+}
+
+.logout-button i {
+    width: 20px;
+    height: 20px;
 }
 
 .logout-button:hover {
