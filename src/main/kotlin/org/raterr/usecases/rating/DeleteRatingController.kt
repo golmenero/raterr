@@ -19,10 +19,10 @@ class DeleteRatingController(
         redirectAttributes: RedirectAttributes
     ): String {
         return try {
-            val movie = movieRepository.findByTmdbIdWithRatings(tmdbId)
+            val movie = movieRepository.findByIdWithRatings(tmdbId)
                 .orElseThrow { NoSuchElementException("Movie not found") }
 
-            val deletedCount = ratingRepository.deleteByMovie(movie)
+            val deletedCount = ratingRepository.deleteByMovieId(movie.tmdbId)
 
             if (deletedCount == 0) {
                 throw NoSuchElementException("Rating not found")

@@ -7,11 +7,7 @@ import org.raterr.usecases.rating.Rating
 @Table(name = "movies")
 data class Movie(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    val id: Int? = null,
-    
-    @Column(name = "tmdb_id", unique = true, nullable = false)
+    @Column(name = "tmdb_id")
     val tmdbId: Int,
     
     @Column(name = "title", nullable = false, length = 255)

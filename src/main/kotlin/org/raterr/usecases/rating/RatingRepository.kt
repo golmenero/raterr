@@ -14,5 +14,5 @@ interface RatingRepository : JpaRepository<Rating, Int> {
     @Query("SELECT r FROM Rating r JOIN r.movie m WHERE m.tmdbId = :tmdbId")
     fun findByMovieTmdbId(tmdbId: Int): List<Rating>
     
-    fun deleteByMovie(movie: Movie): Int
+    fun deleteByMovieId(movieId: Int): Int
 }
