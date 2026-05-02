@@ -75,7 +75,7 @@ input {
 .site-header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 28px;
     padding: 0;
     margin-bottom: 22px;
@@ -87,6 +87,23 @@ input {
     position: sticky;
     top: 16px;
     z-index: 40;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex: 1;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex: 1;
+    justify-content: flex-start;
 }
 
 .nav-monogram {
@@ -158,17 +175,44 @@ input {
     text-decoration: none;
     color: var(--text-soft);
     font-weight: 600;
-    transition: 0.2s ease;
     font-family: var(--font-ui);
     background: transparent;
 }
 
-.site-header > .nav-link:first-of-type {
+.nav-toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-top: 1px solid var(--accent);
     border-right: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding: 0;
 }
 
-.nav-monogram + .nav-link {
-    border-left: 1px solid var(--accent);
+.nav-toggle-group .nav-link {
+    border: none;
+}
+
+.nav-toggle-main .nav-toggle-movies {
+    max-width: 200px;
+}
+
+.nav-toggle-hidden-link {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 12px 0;
+    white-space: nowrap;
+}
+
+.nav-toggle-group:hover .nav-toggle-main {
+    display: none;
+}
+
+.nav-toggle-group:hover .nav-toggle-hidden-link {
+    max-width: 200px;
+    opacity: 1;
+    padding: 12px 24px;
 }
 
 .nav-link:hover,
@@ -1112,10 +1156,6 @@ input[type="range"] {
     display: flex;
     align-items: center;
     gap: 16px;
-    position: absolute;
-    right: 24px;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 .user-info {
@@ -1176,6 +1216,7 @@ input[type="range"] {
     .nav-auth {
         position: static;
         transform: none;
+        gap: 12px;
     }
 
     .site-header {

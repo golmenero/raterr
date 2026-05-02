@@ -2,18 +2,29 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <header class="site-header" th:fragment="nav(active)">
-    <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
-       class="nav-link" th:classappend="${active == 'search'} ? 'active'" href="/">Search</a>
+    <div class="nav-left">
+        <div class="nav-toggle-group">
+            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+               class="nav-link nav-toggle-main" th:classappend="${active == 'search'} ? 'active'" href="/">
+                <span class="nav-toggle-movies">Movies</span>
+            </a>
+            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+               class="nav-link nav-toggle-hidden-link" href="/">Search</a>
+            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
+               class="nav-link nav-toggle-hidden-link" href="/top">Tops</a>
+        </div>
+    </div>
     <span class="nav-monogram" aria-hidden="true" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">R</span>
-    <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
-       class="nav-link" th:classappend="${active == 'top'} ? 'active'" href="/top">Tops</a>
-    
-    <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="nav-link logout-button" aria-label="Logout">
-                <i data-lucide="log-out" aria-hidden="true"></i>
-            </button>
-        </form>
+    <div class="nav-right">
+        <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
+           class="nav-link" th:classappend="${active == 'top'} ? 'active'" href="/top">TV Shows</a>
+        <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="nav-link logout-button" aria-label="Logout">
+                    <i data-lucide="log-out" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
     </div>
     
     <a th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
