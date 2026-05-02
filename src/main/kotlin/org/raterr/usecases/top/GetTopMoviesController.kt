@@ -101,13 +101,6 @@ class GetTopMoviesController(
         val user = userRepository.findById(username).orElse(null)
             ?: return emptyList()
 
-        val ratings = ratingRepository.findByUser(user)
-        ratings.forEach { rating ->
-            if (rating.movie.genres == null || rating.movie.genres.isNullOrBlank()) {
-                fetchAndPersistGenres(rating.movie.tmdbId)
-            }
-        }
-
         val updatedRatings = ratingRepository.findByUser(user)
         return updatedRatings
             .mapNotNull { it.movie.genres }
@@ -115,20 +108,6 @@ class GetTopMoviesController(
             .filter { it.isNotBlank() }
             .distinct()
             .sorted()
-    }
-
-    private fun fetchAndPersistGenres(tmdbId: Int) {
-        try {
-            val tmdbMovie = tmdbClient.movieDetails(tmdbId)
-            val existingMovie = movieRepository.findById(tmdbId).orElse(null)
-            if (existingMovie != null) {
-                val genres = tmdbMovie.genres.joinToString(",") { it.name }
-                val updated = existingMovie.copy(genres = genres)
-                movieRepository.save(updated)
-            }
-        } catch (e: Exception) {
-            // Silently ignore errors when fetching genres
-        }
     }
 }
 
