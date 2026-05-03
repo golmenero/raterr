@@ -1,7 +1,9 @@
-﻿package org.raterr.usecases.tvshow.base
+﻿package org.raterr.usecases.tvshow.detail
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbTvShow
+import org.raterr.usecases.tvshow.TvShow
+import org.raterr.usecases.tvshow.TvShowRepository
 import org.raterr.usecases.tvshow.rating.TvRating
 import org.raterr.usecases.tvshow.rating.TvRatingRepository
 import org.springframework.stereotype.Controller

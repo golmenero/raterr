@@ -1,4 +1,4 @@
-package org.raterr.usecases.movie.base
+package org.raterr.usecases.movie
 
 import jakarta.persistence.*
 import org.raterr.usecases.movie.rating.Rating

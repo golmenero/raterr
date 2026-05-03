@@ -708,6 +708,16 @@ button:disabled {
     font-family: var(--font-ui);
 }
 
+.tag-movie {
+    background: rgba(135, 110, 177, 0.22);
+    color: #ece2ff;
+}
+
+.tag-tvshow {
+    background: rgba(71, 114, 87, 0.22);
+    color: #d4ead6;
+}
+
 .result-title,
 .movie-title,
 .top-title {

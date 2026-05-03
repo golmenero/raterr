@@ -1,6 +1,6 @@
 ﻿package org.raterr.usecases.tvshow.rating
 
-import org.raterr.usecases.tvshow.base.TvShow
+import org.raterr.usecases.tvshow.TvShow
 import org.raterr.usecases.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying

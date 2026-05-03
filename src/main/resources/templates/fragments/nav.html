@@ -4,24 +4,19 @@
 <header class="site-header" th:fragment="nav(active)">
     <div class="nav-left">
         <div class="nav-toggle-group" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
-            <a class="nav-link nav-toggle-main" th:classappend="${active == 'movie-search'} ? 'active'" href="/movie">
-                <span class="nav-toggle-movies">Movies</span>
+            <a class="nav-link nav-toggle-main" th:classappend="${active == 'search'} ? 'active'" href="/search">
+                <span class="nav-toggle-movies">Search</span>
             </a>
-            <a class="nav-link nav-toggle-hidden-link" href="/movie">Search</a>
-            <a class="nav-link nav-toggle-hidden-link" href="/movie/top">Tops</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/movie">Movies</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/movie/top">Movie Tops</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/tv">TV Shows</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/tv/top">TV Tops</a>
         </div>
     </div>
     <div class="nav-center">
         <span class="nav-monogram" aria-hidden="true">R</span>
     </div>
     <div class="nav-right">
-        <div class="nav-toggle-group nav-toggle-group-right" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
-            <a class="nav-link nav-toggle-main" th:classappend="${active == 'tv-search'} ? 'active'" href="/tv">
-                <span class="nav-toggle-movies">TV Shows</span>
-            </a>
-            <a class="nav-link nav-toggle-hidden-link" href="/tv">Search</a>
-            <a class="nav-link nav-toggle-hidden-link" href="/tv/top">Tops</a>
-        </div>
         <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="nav-link logout-button" aria-label="Logout">

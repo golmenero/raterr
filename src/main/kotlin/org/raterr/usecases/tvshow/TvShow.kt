@@ -1,4 +1,4 @@
-﻿package org.raterr.usecases.tvshow.base
+﻿package org.raterr.usecases.tvshow
 
 import jakarta.persistence.*
 import org.raterr.usecases.tvshow.rating.TvRating

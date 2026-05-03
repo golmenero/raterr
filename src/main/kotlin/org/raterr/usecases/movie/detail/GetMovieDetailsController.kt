@@ -1,7 +1,9 @@
-package org.raterr.usecases.movie.base
+package org.raterr.usecases.movie.detail
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbMovie
+import org.raterr.usecases.movie.Movie
+import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.movie.rating.Rating
 import org.raterr.usecases.movie.rating.RatingRepository
 import org.springframework.stereotype.Controller

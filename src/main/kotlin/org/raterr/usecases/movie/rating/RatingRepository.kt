@@ -1,6 +1,6 @@
 package org.raterr.usecases.movie.rating
 
-import org.raterr.usecases.movie.base.Movie
+import org.raterr.usecases.movie.Movie
 import org.raterr.usecases.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying

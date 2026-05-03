@@ -2,8 +2,8 @@
 
 import org.raterr.TmdbClient
 import org.raterr.TmdbTvShow
-import org.raterr.usecases.tvshow.base.TvShow
-import org.raterr.usecases.tvshow.base.TvShowRepository
+import org.raterr.usecases.tvshow.TvShow
+import org.raterr.usecases.tvshow.TvShowRepository
 import org.raterr.usecases.user.UserRepository
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller

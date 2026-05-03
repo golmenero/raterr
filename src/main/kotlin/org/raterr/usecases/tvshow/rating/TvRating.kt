@@ -1,7 +1,7 @@
 ﻿package org.raterr.usecases.tvshow.rating
 
 import jakarta.persistence.*
-import org.raterr.usecases.tvshow.base.TvShow
+import org.raterr.usecases.tvshow.TvShow
 import org.raterr.usecases.user.User
 
 @Entity

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raterr - Search</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/lucide.min.js"></script>
+</head>
+<body>
+<div class="page-shell">
+    <header class="site-header" th:replace="~{fragments/nav :: nav(active='search')}"></header>
+
+    <main class="main-stack">
+        <section class="hero-card">
+            <div class="hero-content">
+                <div>
+                    <h1 class="hero-title">Find movies and TV shows to rate.</h1>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="search-toolbar-centered">
+                <div class="heading-filter search-inline">
+                    <form th:action="@{/search}" method="get" style="display: contents;">
+                        <input id="q" name="q" type="text" th:value="${query}" placeholder="Search movies & TV shows" autocomplete="off" aria-label="Search">
+                        <button class="primary-button icon-button icon-only-button" type="submit" aria-label="Search" title="Search">
+                            <span class="button-icon" aria-hidden="true">
+                                <svg class="button-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <circle cx="11" cy="11" r="6.5"></circle>
+                                    <line x1="16" y1="16" x2="21" y2="21"></line>
+                                </svg>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div th:if="${movies != null or shows != null}" id="results" class="results-grid">
+                <div th:if="${#lists.isEmpty(movies) and #lists.isEmpty(shows)}" class="empty-state">Try with another title, year or original name.</div>
+                
+                <article th:each="item : ${movies}" th:class="'result-card' + (${item.ratingsCount > 0} ? ' result-card-disabled' : '')">
+                    <div class="poster-frame">
+                        <img th:if="${item.posterPath != null}" th:src="@{'https://image.tmdb.org/t/p/w185' + ${item.posterPath}}" th:alt="'Poster of ' + ${item.title}">
+                        <div th:unless="${item.posterPath != null}" class="poster-fallback" th:text="${#strings.toUpperCase(#strings.substring(item.title, 0, 1))}">?</div>
+                    </div>
+                    <div class="result-content">
+                        <div class="tag-row result-meta-row">
+                            <span class="tag tag-movie">Movie</span>
+                            <span class="tag" th:text="${item.year != null} ? ${item.year} : 'Unknown year'">Year</span>
+                            <span th:if="${item.ratingsCount > 0}" class="result-rating-inline">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <span th:if="${i <= (item.averageScore / 2).intValue()}">★</span>
+                                    <span th:unless="${i <= (item.averageScore / 2).intValue()}">☆</span>
+                                </span>
+                            </span>
+                        </div>
+                        <h3 class="result-title" th:text="${item.title}">Title</h3>
+                        <p class="result-overview" th:text="${item.overview != null and item.overview.trim().length() > 0} ? ${item.overview} : 'No synopsis available right now.'">Overview</p>
+                    </div>
+                    <a th:if="${item.ratingsCount == 0}" th:href="@{/movie/rate(id=${item.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${item.title}"></a>
+                </article>
+                
+                <article th:each="item : ${shows}" th:class="'result-card' + (${item.ratingsCount > 0} ? ' result-card-disabled' : '')">
+                    <div class="poster-frame">
+                        <img th:if="${item.posterPath != null}" th:src="@{'https://image.tmdb.org/t/p/w185' + ${item.posterPath}}" th:alt="'Poster of ' + ${item.title}">
+                        <div th:unless="${item.posterPath != null}" class="poster-fallback" th:text="${#strings.toUpperCase(#strings.substring(item.title, 0, 1))}">?</div>
+                    </div>
+                    <div class="result-content">
+                        <div class="tag-row result-meta-row">
+                            <span class="tag tag-tvshow">TV Show</span>
+                            <span class="tag" th:text="${item.year != null} ? ${item.year} : 'Unknown year'">Year</span>
+                            <span th:if="${item.ratingsCount > 0}" class="result-rating-inline">
+                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <span th:if="${i <= (item.averageScore / 2).intValue()}">★</span>
+                                    <span th:unless="${i <= (item.averageScore / 2).intValue()}">☆</span>
+                                </span>
+                            </span>
+                        </div>
+                        <h3 class="result-title" th:text="${item.title}">Title</h3>
+                        <p class="result-overview" th:text="${item.overview != null and item.overview.trim().length() > 0} ? ${item.overview} : 'No synopsis available right now.'">Overview</p>
+                    </div>
+                    <a th:if="${item.ratingsCount == 0}" th:href="@{/tv/rate(id=${item.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${item.title}"></a>
+                </article>
+            </div>
+            <div th:unless="${movies != null or shows != null}" id="results" class="results-grid"></div>
+        </section>
+    </main>
+</div>
+</body>
+<script>
+    lucide.createIcons();
+</script>
+</html>
