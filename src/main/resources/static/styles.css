@@ -1135,13 +1135,20 @@ input[type="range"] {
     padding: 8px;
     border: none;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.06);
+    background: transparent !important;
     cursor: pointer;
-    transition: background 0.2s ease;
+    color: var(--text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important;
+    background-image: none !important;
+    transition: color 0.2s ease;
 }
 
 .nav-hamburger:hover {
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    background: transparent !important;
 }
 
 .hamburger-line {

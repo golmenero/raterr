@@ -5,7 +5,7 @@
     <div class="nav-brand">
         <span class="nav-monogram" aria-hidden="true">R</span>
     </div>
-    <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+    <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
