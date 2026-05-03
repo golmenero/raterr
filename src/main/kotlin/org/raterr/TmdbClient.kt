@@ -1,4 +1,4 @@
-package org.raterr
+﻿package org.raterr
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -55,9 +55,46 @@ class TmdbClient(
             ?: throw RuntimeException("Could not fetch movie details")
     }
 
+    fun searchTvShows(query: String): List<TmdbTvShow> {
+        if (query.isBlank()) return emptyList()
+        requireApiKey()
+
+        return webClient.get()
+            .uri { builder ->
+                builder.path("/search/tv")
+                    .queryParam("api_key", apiKey)
+                    .queryParam("language", "en-US")
+                    .queryParam("include_adult", false)
+                    .queryParam("page", 1)
+                    .queryParam("query", query)
+                    .build()
+            }
+            .retrieve()
+            .bodyToMono(TmdbTvShowSearchResponse::class.java)
+            .block()
+            ?.results
+            ?: emptyList()
+    }
+
+    fun tvShowDetails(tmdbId: Int): TmdbTvShow {
+        requireApiKey()
+
+        return webClient.get()
+            .uri { builder ->
+                builder.path("/tv/{id}")
+                    .queryParam("api_key", apiKey)
+                    .queryParam("language", "en-US")
+                    .build(tmdbId)
+            }
+            .retrieve()
+            .bodyToMono(TmdbTvShow::class.java)
+            .block()
+            ?: throw RuntimeException("Could not fetch TV show details")
+    }
+
     private fun requireApiKey() {
         require(apiKey.isNotBlank()) {
-            "TMDB_API_KEY is missing. Set the environment variable before using search or movie details."
+            "TMDB_API_KEY is missing. Set the environment variable before using search or details."
         }
     }
 }
@@ -80,6 +117,32 @@ data class TmdbMovie(
     val overview: String? = null,
     @JsonProperty("release_date")
     val releaseDate: String? = null,
+    @JsonProperty("poster_path")
+    val posterPath: String? = null,
+    @JsonProperty("vote_average")
+    val voteAverage: Double? = null,
+    @JsonProperty("genres")
+    val genres: List<TmdbGenre> = emptyList()
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class TmdbTvShowSearchResponse(
+    @JsonProperty("results")
+    val results: List<TmdbTvShow> = emptyList()
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class TmdbTvShow(
+    @JsonProperty("id")
+    val id: Int,
+    @JsonProperty("name")
+    val name: String,
+    @JsonProperty("original_name")
+    val originalName: String? = null,
+    @JsonProperty("overview")
+    val overview: String? = null,
+    @JsonProperty("first_air_date")
+    val firstAirDate: String? = null,
     @JsonProperty("poster_path")
     val posterPath: String? = null,
     @JsonProperty("vote_average")
