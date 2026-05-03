@@ -39,5 +39,3 @@ build/
 .env
 .env.*
 !.env.example
-raterr.db
-*.db
