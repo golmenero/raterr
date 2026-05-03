@@ -5,18 +5,46 @@
     <div class="nav-brand">
         <span class="nav-monogram" aria-hidden="true">R</span>
     </div>
-    <nav class="nav-links" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
-        <a class="nav-link" th:classappend="${active == 'search'} ? ' active'" href="/search">Search</a>
-        <a class="nav-link" href="/movie/top">Movies</a>
-        <a class="nav-link" href="/tv/top">TV Shows</a>
-    </nav>
-    <div class="nav-auth" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="nav-link logout-button" aria-label="Logout">
-                <i data-lucide="log-out" aria-hidden="true"></i>
-            </button>
-        </form>
+    <button class="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+    <div class="nav-mobile-menu">
+        <nav class="nav-links" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+            <a class="nav-link" th:classappend="${active == 'search'} ? ' active'" href="/search">Search</a>
+            <a class="nav-link" href="/movie/top">Movies</a>
+            <a class="nav-link" href="/tv/top">TV Shows</a>
+        </nav>
+        <div class="nav-auth" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="nav-link logout-button" aria-label="Logout">
+                    <i data-lucide="log-out" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
     </div>
+    <script>
+        (function() {
+            var hamburger = document.querySelector('.nav-hamburger');
+            var mobileMenu = document.querySelector('.nav-mobile-menu');
+            if (hamburger && mobileMenu) {
+                hamburger.addEventListener('click', function() {
+                    var expanded = hamburger.getAttribute('aria-expanded') === 'true';
+                    hamburger.setAttribute('aria-expanded', !expanded);
+                    hamburger.classList.toggle('active');
+                    mobileMenu.classList.toggle('open');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                        hamburger.setAttribute('aria-expanded', 'false');
+                        hamburger.classList.remove('active');
+                        mobileMenu.classList.remove('open');
+                    }
+                });
+            }
+        })();
+    </script>
 </header>
 </body>
 </html>
