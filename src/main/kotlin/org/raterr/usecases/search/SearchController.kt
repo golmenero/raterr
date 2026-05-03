@@ -26,11 +26,21 @@ class SearchController(
         if (!query.isNullOrBlank()) {
             val movies = searchMovies(query).take(6)
             val shows = searchTvShows(query).take(6)
+            val interleaved = interleave(movies, shows)
             model.addAttribute("query", query)
-            model.addAttribute("movies", movies)
-            model.addAttribute("shows", shows)
+            model.addAttribute("results", interleaved)
         }
         return "search"
+    }
+
+    private fun interleave(movies: List<SearchResultItem>, shows: List<SearchResultItem>): List<SearchResultItem> {
+        val result = mutableListOf<SearchResultItem>()
+        val maxSize = maxOf(movies.size, shows.size)
+        for (i in 0 until maxSize) {
+            if (i < movies.size) result.add(movies[i])
+            if (i < shows.size) result.add(shows[i])
+        }
+        return result
     }
 
     private fun searchMovies(query: String): List<SearchResultItem> {
