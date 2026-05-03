@@ -41,7 +41,7 @@ class SecurityConfig {
                 form
                     .loginPage("/login")
                     .loginProcessingUrl("/login/process")
-                    .defaultSuccessUrl("/movie", true)
+                    .defaultSuccessUrl("/search", true)
                     .failureUrl("/login?error=true")
                     .permitAll()
             }

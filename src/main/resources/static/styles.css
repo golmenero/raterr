@@ -202,24 +202,6 @@ input {
     max-width: 200px;
 }
 
-.nav-toggle-hidden-link {
-    max-width: 0;
-    opacity: 0;
-    overflow: hidden;
-    padding: 12px 0;
-    white-space: nowrap;
-}
-
-.nav-toggle-group:hover .nav-toggle-main {
-    display: none;
-}
-
-.nav-toggle-group:hover .nav-toggle-hidden-link {
-    max-width: 200px;
-    opacity: 1;
-    padding: 12px 24px;
-}
-
 .nav-link:hover,
 .nav-link.active {
     background: transparent;

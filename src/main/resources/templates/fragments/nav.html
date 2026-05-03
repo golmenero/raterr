@@ -7,16 +7,16 @@
             <a class="nav-link nav-toggle-main" th:classappend="${active == 'search'} ? 'active'" href="/search">
                 <span class="nav-toggle-movies">Search</span>
             </a>
-            <a class="nav-link nav-toggle-hidden-link" href="/movie">Movies</a>
-            <a class="nav-link nav-toggle-hidden-link" href="/movie/top">Movie Tops</a>
-            <a class="nav-link nav-toggle-hidden-link" href="/tv">TV Shows</a>
-            <a class="nav-link nav-toggle-hidden-link" href="/tv/top">TV Tops</a>
         </div>
     </div>
     <div class="nav-center">
         <span class="nav-monogram" aria-hidden="true">R</span>
     </div>
     <div class="nav-right">
+        <div class="nav-toggle-group nav-toggle-group-right" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+            <a class="nav-link" href="/movie/top">Movies</a>
+            <a class="nav-link" href="/tv/top">TV Shows</a>
+        </div>
         <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="nav-link logout-button" aria-label="Logout">
@@ -25,6 +25,7 @@
             </form>
         </div>
     </div>
+
 </header>
 </body>
 </html>
