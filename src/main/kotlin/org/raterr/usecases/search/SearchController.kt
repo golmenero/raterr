@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
+import java.time.LocalDate
 
 @Controller
 class SearchController(
@@ -56,6 +57,7 @@ class SearchController(
             val isFollowed = currentUsername?.let {
                 followRepository.existsByUserUsernameAndContentTypeAndContentTmdbId(it, "movie", tmdbMovie.id)
             } ?: false
+            val isReleased = tmdbMovie.releaseDate?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) <= LocalDate.now() } ?: false
             SearchResultItem(
                 tmdbId = tmdbMovie.id,
                 title = tmdbMovie.title,
@@ -66,7 +68,9 @@ class SearchController(
                 averageScore = stats.averageScore,
                 ratingsCount = stats.ratingsCount,
                 type = "movie",
-                isFollowed = isFollowed
+                isFollowed = isFollowed,
+                canRate = isReleased,
+                canFollow = !isReleased
             )
         }
     }
@@ -79,6 +83,9 @@ class SearchController(
             val isFollowed = currentUsername?.let {
                 followRepository.existsByUserUsernameAndContentTypeAndContentTmdbId(it, "tvshow", tmdbShow.id)
             } ?: false
+            val isReleased = tmdbShow.firstAirDate?.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) <= LocalDate.now() } ?: false
+            val details = tmdbClient.tvShowDetails(tmdbShow.id)
+            val hasEnded = details.status in listOf("Ended", "Canceled")
             SearchResultItem(
                 tmdbId = tmdbShow.id,
                 title = tmdbShow.name,
@@ -89,7 +96,9 @@ class SearchController(
                 averageScore = stats.averageScore,
                 ratingsCount = stats.ratingsCount,
                 type = "tvshow",
-                isFollowed = isFollowed
+                isFollowed = isFollowed,
+                canRate = isReleased && hasEnded,
+                canFollow = !isReleased || !hasEnded
             )
         }
     }
@@ -122,5 +131,7 @@ data class SearchResultItem(
     val averageScore: Double,
     val ratingsCount: Int,
     val type: String,
-    val isFollowed: Boolean = false
+    val isFollowed: Boolean = false,
+    val canRate: Boolean = true,
+    val canFollow: Boolean = true
 )

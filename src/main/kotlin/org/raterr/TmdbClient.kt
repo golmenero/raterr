@@ -148,7 +148,9 @@ data class TmdbTvShow(
     @JsonProperty("vote_average")
     val voteAverage: Double? = null,
     @JsonProperty("genres")
-    val genres: List<TmdbGenre> = emptyList()
+    val genres: List<TmdbGenre> = emptyList(),
+    @JsonProperty("status")
+    val status: String? = null
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
