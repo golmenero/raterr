@@ -627,6 +627,79 @@ button:disabled {
     font-family: var(--font-serif);
 }
 
+.result-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.follow-btn {
+    background: transparent !important;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: color 0.2s ease;
+    box-shadow: none !important;
+}
+
+.follow-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.follow-btn:hover {
+    color: var(--text);
+}
+
+.follow-btn.is-followed {
+    color: var(--success-text);
+}
+
+.follow-btn.is-followed svg {
+    fill: var(--success-text);
+    stroke: var(--success-text);
+}
+
+.rate-btn {
+    background: transparent !important;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    transition: color 0.2s ease;
+    box-shadow: none !important;
+    text-decoration: none;
+}
+
+.rate-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.rate-btn:hover {
+    color: var(--text);
+}
+
 .result-content {
     padding: 22px;
     display: grid;

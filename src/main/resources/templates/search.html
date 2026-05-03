@@ -50,18 +50,26 @@
                             <span th:if="${item.type == 'movie'}" class="tag tag-movie">Movie</span>
                             <span th:if="${item.type == 'tvshow'}" class="tag tag-tvshow">TV Show</span>
                             <span class="tag" th:text="${item.year != null} ? ${item.year} : 'Unknown year'">Year</span>
-                            <span th:if="${item.ratingsCount > 0}" class="result-rating-inline">
-                                <span th:each="i : ${#numbers.sequence(1, 5)}">
-                                    <span th:if="${i <= (item.averageScore / 2).intValue()}">★</span>
-                                    <span th:unless="${i <= (item.averageScore / 2).intValue()}">☆</span>
-                                </span>
-                            </span>
                         </div>
                         <h3 class="result-title" th:text="${item.title}">Title</h3>
                         <p class="result-overview" th:text="${item.overview != null and item.overview.trim().length() > 0} ? ${item.overview} : 'No synopsis available right now.'">Overview</p>
+                        <div class="result-actions">
+                            <a th:if="${item.type == 'movie' && item.ratingsCount == 0}" th:href="@{/movie/rate(id=${item.tmdbId})}" class="rate-btn">
+                                <i data-lucide="star"></i>
+                            </a>
+                            <a th:if="${item.type == 'tvshow' && item.ratingsCount == 0}" th:href="@{/tv/rate(id=${item.tmdbId})}" class="rate-btn">
+                                <i data-lucide="star"></i>
+                            </a>
+                            <form th:action="@{/follow}" method="post" style="display: inline;">
+                                <input type="hidden" name="tmdbId" th:value="${item.tmdbId}" />
+                                <input type="hidden" name="type" th:value="${item.type}" />
+                                <input type="hidden" name="q" th:value="${query}" />
+                                <button type="submit" th:class="${item.isFollowed} ? 'follow-btn is-followed' : 'follow-btn'">
+                                    <i data-lucide="heart"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <a th:if="${item.ratingsCount == 0 and item.type == 'movie'}" th:href="@{/movie/rate(id=${item.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${item.title}"></a>
-                    <a th:if="${item.ratingsCount == 0 and item.type == 'tvshow'}" th:href="@{/tv/rate(id=${item.tmdbId})}" class="result-card-link" th:aria-label="'Rate ' + ${item.title}"></a>
                 </article>
             </div>
             <div th:unless="${results != null}" id="results" class="results-grid"></div>
