@@ -1138,9 +1138,6 @@ input[type="range"] {
     background: transparent !important;
     cursor: pointer;
     color: var(--text-soft);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     box-shadow: none !important;
     background-image: none !important;
     transition: color 0.2s ease;
