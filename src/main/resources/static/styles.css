@@ -164,6 +164,7 @@ input {
     text-decoration: none;
     color: var(--text-soft);
     font-weight: 600;
+    font-size: 1.25rem;
     font-family: var(--font-serif);
     background: transparent;
 }
