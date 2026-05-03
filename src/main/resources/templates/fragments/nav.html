@@ -3,28 +3,24 @@
 <body>
 <header class="site-header" th:fragment="nav(active)">
     <div class="nav-left">
-        <div class="nav-toggle-group">
-            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
-               class="nav-link nav-toggle-main" th:classappend="${active == 'movie-search'} ? 'active'" href="/movie">
+        <div class="nav-toggle-group" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+            <a class="nav-link nav-toggle-main" th:classappend="${active == 'movie-search'} ? 'active'" href="/movie">
                 <span class="nav-toggle-movies">Movies</span>
             </a>
-            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
-               class="nav-link nav-toggle-hidden-link" href="/movie">Search</a>
-            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
-               class="nav-link nav-toggle-hidden-link" href="/movie/top">Tops</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/movie">Search</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/movie/top">Tops</a>
         </div>
     </div>
-    <span class="nav-monogram" aria-hidden="true" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">R</span>
+    <div class="nav-center">
+        <span class="nav-monogram" aria-hidden="true">R</span>
+    </div>
     <div class="nav-right">
-        <div class="nav-toggle-group nav-toggle-group-right">
-            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
-               class="nav-link nav-toggle-main" th:classappend="${active == 'tv-search'} ? 'active'" href="/tv">
+        <div class="nav-toggle-group nav-toggle-group-right" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+            <a class="nav-link nav-toggle-main" th:classappend="${active == 'tv-search'} ? 'active'" href="/tv">
                 <span class="nav-toggle-movies">TV Shows</span>
             </a>
-            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
-               class="nav-link nav-toggle-hidden-link" href="/tv">Search</a>
-            <a th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}"
-               class="nav-link nav-toggle-hidden-link" href="/tv/top">Tops</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/tv">Search</a>
+            <a class="nav-link nav-toggle-hidden-link" href="/tv/top">Tops</a>
         </div>
         <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
             <form th:action="@{/logout}" method="post">
@@ -34,9 +30,6 @@
             </form>
         </div>
     </div>
-    
-    <a th:unless="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" 
-       class="nav-monogram nav-monogram-link" aria-hidden="true" href="/login">R</a>
 </header>
 </body>
 </html>
