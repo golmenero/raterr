@@ -89,21 +89,10 @@ input {
     z-index: 40;
 }
 
-.nav-left {
+.nav-brand {
     display: flex;
     align-items: center;
-    gap: 28px;
-    flex: 1;
-    justify-content: flex-end;
-    position: relative;
-}
-
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    flex: 1;
-    justify-content: flex-start;
+    flex-shrink: 0;
 }
 
 .nav-monogram {
@@ -179,27 +168,14 @@ input {
     background: transparent;
 }
 
-.nav-toggle-group {
+.nav-links {
     display: flex;
     align-items: center;
     gap: 0;
-    border-top: 1px solid var(--accent);
-    border-right: 1px solid var(--accent);
-    border-bottom: 1px solid var(--accent);
-    padding: 0;
 }
 
-.nav-toggle-group-right {
-    border-right: none;
-    border-left: 1px solid var(--accent);
-}
-
-.nav-toggle-group .nav-link {
+.nav-links .nav-link {
     border: none;
-}
-
-.nav-toggle-main .nav-toggle-movies {
-    max-width: 200px;
 }
 
 .nav-link:hover,
@@ -1221,6 +1197,12 @@ input[type="range"] {
         flex-wrap: wrap;
         justify-content: center;
     }
+
+    .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 .spacer-top {
@@ -1252,6 +1234,12 @@ input[type="range"] {
         align-items: center;
         border-radius: 0;
         gap: 20px;
+    }
+
+    .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
     }
 
     .hero-card {

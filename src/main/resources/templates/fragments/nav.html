@@ -2,30 +2,21 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <header class="site-header" th:fragment="nav(active)">
-    <div class="nav-left">
-        <div class="nav-toggle-group" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
-            <a class="nav-link nav-toggle-main" th:classappend="${active == 'search'} ? 'active'" href="/search">
-                <span class="nav-toggle-movies">Search</span>
-            </a>
-        </div>
-    </div>
-    <div class="nav-center">
+    <div class="nav-brand">
         <span class="nav-monogram" aria-hidden="true">R</span>
     </div>
-    <div class="nav-right">
-        <div class="nav-toggle-group nav-toggle-group-right" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
-            <a class="nav-link" href="/movie/top">Movies</a>
-            <a class="nav-link" href="/tv/top">TV Shows</a>
-        </div>
-        <div th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}" class="nav-auth">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" class="nav-link logout-button" aria-label="Logout">
-                    <i data-lucide="log-out" aria-hidden="true"></i>
-                </button>
-            </form>
-        </div>
+    <nav class="nav-links" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+        <a class="nav-link" th:classappend="${active == 'search'} ? ' active'" href="/search">Search</a>
+        <a class="nav-link" href="/movie/top">Movies</a>
+        <a class="nav-link" href="/tv/top">TV Shows</a>
+    </nav>
+    <div class="nav-auth" th:if="${#authentication.isAuthenticated() and #authentication.name != 'anonymousUser'}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="nav-link logout-button" aria-label="Logout">
+                <i data-lucide="log-out" aria-hidden="true"></i>
+            </button>
+        </form>
     </div>
-
 </header>
 </body>
 </html>
