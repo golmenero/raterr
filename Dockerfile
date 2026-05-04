@@ -1,6 +1,4 @@
-FROM maven:3.9.9-eclipse-temurin-21
-
-# RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -8,6 +6,15 @@ COPY pom.xml ./
 RUN mvn -q -DskipTests dependency:go-offline
 
 COPY src ./src
+RUN mvn -q -DskipTests package
+
+FROM eclipse-temurin:21-jre-alpine
+
+RUN apk add --no-cache sqlite
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
 
 ENV PORT=8080
 ENV SQLITE_DB_PATH=/data/raterr.db
@@ -15,5 +22,4 @@ ENV SQLITE_DB_PATH=/data/raterr.db
 EXPOSE 8080
 VOLUME ["/data"]
 
-CMD ["mvn", "-DskipTests", "spring-boot:run"]
-
+ENTRYPOINT ["java", "-jar", "app.jar"]
