@@ -52,7 +52,7 @@ class AddRatingController(
             if (existingRating != null) {
                 redirectAttributes.addAttribute("id", tmdbId)
                 redirectAttributes.addFlashAttribute("error", "A rating already exists for this movie.")
-                return "redirect:/rate"
+                return "redirect:/movie/rate"
             }
 
             val newRating = Rating(
@@ -68,15 +68,15 @@ class AddRatingController(
             ratingRepository.save(newRating)
 
             redirectAttributes.addFlashAttribute("success", "Rating saved successfully.")
-            "redirect:/top"
+            "redirect:/movie/top"
         } catch (e: IllegalArgumentException) {
             redirectAttributes.addAttribute("id", tmdbId)
             redirectAttributes.addFlashAttribute("error", e.message)
-            "redirect:/rate"
+            "redirect:/movie/rate"
         } catch (e: Exception) {
             redirectAttributes.addAttribute("id", tmdbId)
             redirectAttributes.addFlashAttribute("error", "Could not save the rating.")
-            "redirect:/rate"
+            "redirect:/movie/rate"
         }
     }
 

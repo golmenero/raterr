@@ -30,13 +30,13 @@ class DeleteRatingController(
             }
 
             redirectAttributes.addFlashAttribute("success", "Rating deleted successfully.")
-            "redirect:/top"
+            "redirect:/movie/top"
         } catch (e: NoSuchElementException) {
             redirectAttributes.addFlashAttribute("error", "Could not delete the rating. A")
-            "redirect:/top"
+            "redirect:/movie/top"
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute("error", e.printStackTrace())
-            "redirect:/top"
+            "redirect:/movie/top"
         }
     }
 }
