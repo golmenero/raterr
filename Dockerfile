@@ -10,16 +10,12 @@ RUN mvn -q -DskipTests package
 
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk add --no-cache sqlite
-
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 
 ENV PORT=8080
-ENV SQLITE_DB_PATH=/data/raterr.db
 
 EXPOSE 8080
-VOLUME ["/data"]
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
