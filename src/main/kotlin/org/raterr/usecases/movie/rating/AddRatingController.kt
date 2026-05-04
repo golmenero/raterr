@@ -48,7 +48,7 @@ class AddRatingController(
             val movie = movieRepository.findById(tmdbId).orElse(null)
                 ?: upsertMovie(tmdbClient.movieDetails(tmdbId))
 
-            val existingRating = ratingRepository.findByMovieAndUser(movie, user).firstOrNull()
+            val existingRating = ratingRepository.findByMovieTmdbIdAndUserUsername(tmdbId, user.username).firstOrNull()
             if (existingRating != null) {
                 redirectAttributes.addAttribute("id", tmdbId)
                 redirectAttributes.addFlashAttribute("error", "A rating already exists for this movie.")
@@ -56,8 +56,8 @@ class AddRatingController(
             }
 
             val newRating = Rating(
-                movie = movie,
-                user = user,
+                movieTmdbId = movie.tmdbId,
+                userUsername = user.username,
                 directing = directing,
                 cinematography = cinematography,
                 acting = acting,

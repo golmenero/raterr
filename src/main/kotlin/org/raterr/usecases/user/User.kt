@@ -1,25 +1,13 @@
 package org.raterr.usecases.user
 
-import jakarta.persistence.*
-import org.raterr.usecases.movie.rating.Rating
-import java.time.Instant
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
-@Table(name = "users")
+@Table("users")
 data class User(
     @Id
-    @Column(name = "username", length = 50)
     val username: String,
-
-    @Column(name = "email", unique = true, nullable = false, length = 255)
     val email: String,
-
-    @Column(name = "password_hash", nullable = false)
     val passwordHash: String,
-
-    @Column(name = "created_at", nullable = false)
-    val createdAt: Instant = Instant.now(),
-
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val ratings: MutableList<Rating> = mutableListOf()
+    val createdAtEpochMs: Long = System.currentTimeMillis()
 )

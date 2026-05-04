@@ -48,7 +48,7 @@ class AddTvRatingController(
             val show = tvShowRepository.findById(tmdbId).orElse(null)
                 ?: upsertTvShow(tmdbClient.tvShowDetails(tmdbId))
 
-            val existingRating = tvRatingRepository.findByTvShowAndUser(show, user).firstOrNull()
+            val existingRating = tvRatingRepository.findByTvShowTmdbIdAndUserUsername(tmdbId, user.username).firstOrNull()
             if (existingRating != null) {
                 redirectAttributes.addAttribute("id", tmdbId)
                 redirectAttributes.addFlashAttribute("error", "A rating already exists for this TV show.")
@@ -56,8 +56,8 @@ class AddTvRatingController(
             }
 
             val newRating = TvRating(
-                tvShow = show,
-                user = user,
+                tvShowTmdbId = show.tmdbId,
+                userUsername = user.username,
                 directing = directing,
                 cinematography = cinematography,
                 acting = acting,

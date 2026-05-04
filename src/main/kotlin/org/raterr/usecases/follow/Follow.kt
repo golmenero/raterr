@@ -1,28 +1,14 @@
 package org.raterr.usecases.follow
 
-import jakarta.persistence.*
-import org.raterr.usecases.user.User
-import java.time.Instant
+import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Table
 
-@Entity
-@Table(name = "follows", uniqueConstraints = [
-    UniqueConstraint(columnNames = ["user_username", "content_type", "content_tmdb_id"])
-])
+@Table("follows")
 data class Follow(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_username", referencedColumnName = "username", nullable = false)
-    val user: User,
-
-    @Column(name = "content_type", nullable = false)
+    val id: Long? = null,
+    val userUsername: String,
     val contentType: String,
-
-    @Column(name = "content_tmdb_id", nullable = false)
     val contentTmdbId: Int,
-
-    @Column(name = "created_at", nullable = false)
-    val createdAt: Instant = Instant.now()
+    val createdAtEpochMs: Long = System.currentTimeMillis()
 )

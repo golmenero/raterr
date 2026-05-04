@@ -3,10 +3,8 @@ package org.raterr.usecases.search
 import org.raterr.TmdbClient
 import org.raterr.usecases.follow.FollowRepository
 import org.raterr.usecases.movie.MovieRepository
-import org.raterr.usecases.movie.rating.Rating
 import org.raterr.usecases.movie.rating.RatingRepository
 import org.raterr.usecases.tvshow.TvShowRepository
-import org.raterr.usecases.tvshow.rating.TvRating
 import org.raterr.usecases.tvshow.rating.TvRatingRepository
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Controller
@@ -52,7 +50,7 @@ class SearchController(
     private fun searchMovies(query: String, currentUsername: String?): List<SearchResultItem> {
         return tmdbClient.searchMovies(query).map { tmdbMovie ->
             val movie = movieRepository.findById(tmdbMovie.id).orElse(null)
-            val ratings = if (movie != null) ratingRepository.findByMovie(movie) else emptyList()
+            val ratings = if (movie != null) ratingRepository.findByMovieTmdbId(tmdbMovie.id) else emptyList()
             val stats = calculateMovieStats(ratings)
             val isFollowed = currentUsername?.let {
                 followRepository.existsByUserUsernameAndContentTypeAndContentTmdbId(it, "movie", tmdbMovie.id)
@@ -78,7 +76,7 @@ class SearchController(
     private fun searchTvShows(query: String, currentUsername: String?): List<SearchResultItem> {
         return tmdbClient.searchTvShows(query).map { tmdbShow ->
             val show = tvShowRepository.findById(tmdbShow.id).orElse(null)
-            val ratings = if (show != null) tvRatingRepository.findByTvShow(show) else emptyList()
+            val ratings = if (show != null) tvRatingRepository.findByTvShowTmdbId(tmdbShow.id) else emptyList()
             val stats = calculateTvStats(ratings)
             val isFollowed = currentUsername?.let {
                 followRepository.existsByUserUsernameAndContentTypeAndContentTmdbId(it, "tvshow", tmdbShow.id)
@@ -103,13 +101,13 @@ class SearchController(
         }
     }
 
-    private fun calculateMovieStats(ratings: List<Rating>): SearchScoreStats {
+    private fun calculateMovieStats(ratings: List<org.raterr.usecases.movie.rating.Rating>): SearchScoreStats {
         if (ratings.isEmpty()) return SearchScoreStats(0.0, 0)
         val avg = ratings.map { (it.directing + it.cinematography + it.acting + it.soundtrack + it.screenplay) / 5.0 }.average()
         return SearchScoreStats(avg, ratings.size)
     }
 
-    private fun calculateTvStats(ratings: List<TvRating>): SearchScoreStats {
+    private fun calculateTvStats(ratings: List<org.raterr.usecases.tvshow.rating.TvRating>): SearchScoreStats {
         if (ratings.isEmpty()) return SearchScoreStats(0.0, 0)
         val avg = ratings.map { (it.directing + it.cinematography + it.acting + it.soundtrack + it.screenplay) / 5.0 }.average()
         return SearchScoreStats(avg, ratings.size)

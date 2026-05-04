@@ -63,9 +63,9 @@ class RegisterController(
 
         userRepository.save(user)
 
-        val ratingsWithoutUser = ratingRepository.findAll().filter { it.user == null }
+        val ratingsWithoutUser = ratingRepository.findAllWithoutUser()
         ratingsWithoutUser.forEach { rating ->
-            ratingRepository.save(rating.copy(user = user))
+            ratingRepository.save(rating.copy(userUsername = user.username))
         }
 
         return "redirect:/login"

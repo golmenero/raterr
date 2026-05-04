@@ -34,7 +34,7 @@ class FollowController(
             followRepository.delete(existingFollow.get())
         } else {
             val follow = Follow(
-                user = user,
+                userUsername = user.username,
                 contentType = type,
                 contentTmdbId = tmdbId
             )

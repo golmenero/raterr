@@ -1,5 +1,7 @@
 package org.raterr.usecases.movie.top
 
+import org.raterr.usecases.movie.Movie
+import org.raterr.usecases.movie.MovieRepository
 import org.raterr.usecases.movie.rating.Rating
 import org.raterr.usecases.movie.rating.RatingRepository
 import org.raterr.usecases.user.UserRepository
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 class GetTopMoviesController(
+    private val movieRepository: MovieRepository,
     private val ratingRepository: RatingRepository,
     private val userRepository: UserRepository
 ) {
@@ -26,7 +29,7 @@ class GetTopMoviesController(
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
             val user = userRepository.findById(username).orElse(null)
-            
+
             if (user == null) {
                 model.addAttribute("tops", emptyList<GetTopMoviesResponse>())
                 model.addAttribute("selectedYear", year)
@@ -34,10 +37,12 @@ class GetTopMoviesController(
                 model.addAttribute("availableCategories", emptyList<String>())
                 return "top"
             }
-            
-            val ratings = ratingRepository.findByUser(user)
-            val tops = getTopMovies(ratings, limit, year, category)
-            
+
+            val ratings = ratingRepository.findByUserUsername(user.username)
+            val moviesById = movieRepository.findAllById(ratings.map { it.movieTmdbId }.toSet())
+                .associateBy { it.tmdbId }
+            val tops = getTopMovies(ratings, moviesById, limit, year, category)
+
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
             model.addAttribute("selectedCategory", category)
@@ -48,36 +53,50 @@ class GetTopMoviesController(
         }
     }
 
-    private fun getTopMovies(ratings: List<Rating>, limit: Int?, year: Int?, category: String?): List<GetTopMoviesResponse> {
+    private fun getTopMovies(
+        ratings: List<Rating>,
+        moviesById: Map<Int, Movie>,
+        limit: Int?,
+        year: Int?,
+        category: String?
+    ): List<GetTopMoviesResponse> {
         val safeLimit = limit?.coerceIn(1, 100)
 
         var filtered = if (year != null) {
-            ratings.filter { it.movie.releaseYear == year }
+            ratings.filter { moviesById[it.movieTmdbId]?.releaseYear == year }
         } else {
             ratings
         }
 
         if (category != null && category.isNotBlank()) {
             filtered = filtered.filter { rating ->
-                rating.movie.genres?.contains(category, ignoreCase = true) == true
+                moviesById[rating.movieTmdbId]?.genres?.contains(category, ignoreCase = true) == true
             }
         }
 
         val results = filtered
-            .groupBy { it.movie }
-            .map { (movie, ratings) ->
-                val count = ratings.size
+            .groupBy { it.movieTmdbId }
+            .map { (movieTmdbId, ratingsForMovie) ->
+                val movie = moviesById[movieTmdbId] ?: return@map GetTopMoviesResponse(
+                    tmdbId = movieTmdbId,
+                    title = "Unknown",
+                    releaseYear = null,
+                    posterPath = null,
+                    averageScore = 0.0,
+                    ratingsCount = ratingsForMovie.size
+                )
+                val count = ratingsForMovie.size
 
-                val individualScores = ratings.map { rating ->
+                val individualScores = ratingsForMovie.map { rating ->
                     (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
                 }
 
                 val avgScore = if (individualScores.isNotEmpty()) individualScores.average() else 0.0
-                val avgDirecting = if (ratings.isNotEmpty()) ratings.map { it.directing }.average() else 0.0
-                val avgCinematography = if (ratings.isNotEmpty()) ratings.map { it.cinematography }.average() else 0.0
-                val avgActing = if (ratings.isNotEmpty()) ratings.map { it.acting }.average() else 0.0
-                val avgSoundtrack = if (ratings.isNotEmpty()) ratings.map { it.soundtrack }.average() else 0.0
-                val avgScreenplay = if (ratings.isNotEmpty()) ratings.map { it.screenplay }.average() else 0.0
+                val avgDirecting = if (ratingsForMovie.isNotEmpty()) ratingsForMovie.map { it.directing }.average() else 0.0
+                val avgCinematography = if (ratingsForMovie.isNotEmpty()) ratingsForMovie.map { it.cinematography }.average() else 0.0
+                val avgActing = if (ratingsForMovie.isNotEmpty()) ratingsForMovie.map { it.acting }.average() else 0.0
+                val avgSoundtrack = if (ratingsForMovie.isNotEmpty()) ratingsForMovie.map { it.soundtrack }.average() else 0.0
+                val avgScreenplay = if (ratingsForMovie.isNotEmpty()) ratingsForMovie.map { it.screenplay }.average() else 0.0
 
                 GetTopMoviesResponse(
                     tmdbId = movie.tmdbId,

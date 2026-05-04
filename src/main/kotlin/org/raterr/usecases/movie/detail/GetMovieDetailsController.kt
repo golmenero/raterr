@@ -4,7 +4,6 @@ import org.raterr.TmdbClient
 import org.raterr.TmdbMovie
 import org.raterr.usecases.movie.Movie
 import org.raterr.usecases.movie.MovieRepository
-import org.raterr.usecases.movie.rating.Rating
 import org.raterr.usecases.movie.rating.RatingRepository
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -24,7 +23,7 @@ class GetMovieDetailsController(
             val movie = getMovieByTmdbId(tmdbId)
             val ratings = ratingRepository.findByMovieTmdbId(tmdbId)
             val alreadyRated = ratings.isNotEmpty()
-            
+
             model.addAttribute("movie", movie)
             model.addAttribute("alreadyRated", alreadyRated)
             return "rate"
@@ -78,7 +77,7 @@ class GetMovieDetailsController(
     }
 
     private fun buildResponse(movie: Movie): GetMovieDetailsResponse {
-        val ratings = ratingRepository.findByMovie(movie)
+        val ratings = ratingRepository.findByMovieTmdbId(movie.tmdbId)
         val stats = calculateStats(ratings)
 
         return GetMovieDetailsResponse(
@@ -94,7 +93,7 @@ class GetMovieDetailsController(
         )
     }
 
-    private fun calculateStats(ratings: List<Rating>): GetMovieScoreStats {
+    private fun calculateStats(ratings: List<org.raterr.usecases.movie.rating.Rating>): GetMovieScoreStats {
         if (ratings.isEmpty()) {
             return GetMovieScoreStats(averageScore = 0.0, ratingsCount = 0)
         }

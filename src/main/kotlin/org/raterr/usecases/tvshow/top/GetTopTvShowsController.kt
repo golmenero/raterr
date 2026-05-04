@@ -1,5 +1,7 @@
 ﻿package org.raterr.usecases.tvshow.top
 
+import org.raterr.usecases.tvshow.TvShow
+import org.raterr.usecases.tvshow.TvShowRepository
 import org.raterr.usecases.tvshow.rating.TvRating
 import org.raterr.usecases.tvshow.rating.TvRatingRepository
 import org.raterr.usecases.user.UserRepository
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 
 @Controller
 class GetTopTvShowsController(
+    private val tvShowRepository: TvShowRepository,
     private val tvRatingRepository: TvRatingRepository,
     private val userRepository: UserRepository
 ) {
@@ -26,7 +29,7 @@ class GetTopTvShowsController(
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
             val user = userRepository.findById(username).orElse(null)
-            
+
             if (user == null) {
                 model.addAttribute("tops", emptyList<GetTopTvShowsResponse>())
                 model.addAttribute("selectedYear", year)
@@ -34,10 +37,12 @@ class GetTopTvShowsController(
                 model.addAttribute("availableCategories", emptyList<String>())
                 return "tv-top"
             }
-            
-            val ratings = tvRatingRepository.findByUser(user)
-            val tops = getTopTvShows(ratings, limit, year, category)
-            
+
+            val ratings = tvRatingRepository.findByUserUsername(user.username)
+            val showsById = tvShowRepository.findAllById(ratings.map { it.tvShowTmdbId }.toSet())
+                .associateBy { it.tmdbId }
+            val tops = getTopTvShows(ratings, showsById, limit, year, category)
+
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
             model.addAttribute("selectedCategory", category)
@@ -48,36 +53,50 @@ class GetTopTvShowsController(
         }
     }
 
-    private fun getTopTvShows(ratings: List<TvRating>, limit: Int?, year: Int?, category: String?): List<GetTopTvShowsResponse> {
+    private fun getTopTvShows(
+        ratings: List<TvRating>,
+        showsById: Map<Int, TvShow>,
+        limit: Int?,
+        year: Int?,
+        category: String?
+    ): List<GetTopTvShowsResponse> {
         val safeLimit = limit?.coerceIn(1, 100)
 
         var filtered = if (year != null) {
-            ratings.filter { it.tvShow.firstAirYear == year }
+            ratings.filter { showsById[it.tvShowTmdbId]?.firstAirYear == year }
         } else {
             ratings
         }
 
         if (category != null && category.isNotBlank()) {
             filtered = filtered.filter { rating ->
-                rating.tvShow.genres?.contains(category, ignoreCase = true) == true
+                showsById[rating.tvShowTmdbId]?.genres?.contains(category, ignoreCase = true) == true
             }
         }
 
         val results = filtered
-            .groupBy { it.tvShow }
-            .map { (show, ratings) ->
-                val count = ratings.size
+            .groupBy { it.tvShowTmdbId }
+            .map { (showTmdbId, ratingsForShow) ->
+                val show = showsById[showTmdbId] ?: return@map GetTopTvShowsResponse(
+                    tmdbId = showTmdbId,
+                    name = "Unknown",
+                    firstAirYear = null,
+                    posterPath = null,
+                    averageScore = 0.0,
+                    ratingsCount = ratingsForShow.size
+                )
+                val count = ratingsForShow.size
 
-                val individualScores = ratings.map { rating ->
+                val individualScores = ratingsForShow.map { rating ->
                     (rating.directing + rating.cinematography + rating.acting + rating.soundtrack + rating.screenplay) / 5.0
                 }
 
                 val avgScore = if (individualScores.isNotEmpty()) individualScores.average() else 0.0
-                val avgDirecting = if (ratings.isNotEmpty()) ratings.map { it.directing }.average() else 0.0
-                val avgCinematography = if (ratings.isNotEmpty()) ratings.map { it.cinematography }.average() else 0.0
-                val avgActing = if (ratings.isNotEmpty()) ratings.map { it.acting }.average() else 0.0
-                val avgSoundtrack = if (ratings.isNotEmpty()) ratings.map { it.soundtrack }.average() else 0.0
-                val avgScreenplay = if (ratings.isNotEmpty()) ratings.map { it.screenplay }.average() else 0.0
+                val avgDirecting = if (ratingsForShow.isNotEmpty()) ratingsForShow.map { it.directing }.average() else 0.0
+                val avgCinematography = if (ratingsForShow.isNotEmpty()) ratingsForShow.map { it.cinematography }.average() else 0.0
+                val avgActing = if (ratingsForShow.isNotEmpty()) ratingsForShow.map { it.acting }.average() else 0.0
+                val avgSoundtrack = if (ratingsForShow.isNotEmpty()) ratingsForShow.map { it.soundtrack }.average() else 0.0
+                val avgScreenplay = if (ratingsForShow.isNotEmpty()) ratingsForShow.map { it.screenplay }.average() else 0.0
 
                 GetTopTvShowsResponse(
                     tmdbId = show.tmdbId,

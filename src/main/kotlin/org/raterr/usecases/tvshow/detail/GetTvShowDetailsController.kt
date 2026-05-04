@@ -4,7 +4,6 @@ import org.raterr.TmdbClient
 import org.raterr.TmdbTvShow
 import org.raterr.usecases.tvshow.TvShow
 import org.raterr.usecases.tvshow.TvShowRepository
-import org.raterr.usecases.tvshow.rating.TvRating
 import org.raterr.usecases.tvshow.rating.TvRatingRepository
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -24,7 +23,7 @@ class GetTvShowDetailsController(
             val show = getTvShowByTmdbId(tmdbId)
             val ratings = tvRatingRepository.findByTvShowTmdbId(tmdbId)
             val alreadyRated = ratings.isNotEmpty()
-            
+
             model.addAttribute("show", show)
             model.addAttribute("alreadyRated", alreadyRated)
             return "tv-rate"
@@ -78,7 +77,7 @@ class GetTvShowDetailsController(
     }
 
     private fun buildResponse(show: TvShow): GetTvShowDetailsResponse {
-        val ratings = tvRatingRepository.findByTvShow(show)
+        val ratings = tvRatingRepository.findByTvShowTmdbId(show.tmdbId)
         val stats = calculateStats(ratings)
 
         return GetTvShowDetailsResponse(
@@ -94,7 +93,7 @@ class GetTvShowDetailsController(
         )
     }
 
-    private fun calculateStats(ratings: List<TvRating>): GetTvShowScoreStats {
+    private fun calculateStats(ratings: List<org.raterr.usecases.tvshow.rating.TvRating>): GetTvShowScoreStats {
         if (ratings.isEmpty()) {
             return GetTvShowScoreStats(averageScore = 0.0, ratingsCount = 0)
         }

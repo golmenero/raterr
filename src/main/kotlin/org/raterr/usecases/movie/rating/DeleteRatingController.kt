@@ -23,7 +23,7 @@ class DeleteRatingController(
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
 
-            val deletedCount = ratingRepository.deleteByMovieTmdbIdAndUsername(tmdbId, username)
+            val deletedCount = ratingRepository.deleteByMovieTmdbIdAndUserUsername(tmdbId, username)
 
             if (deletedCount == 0) {
                 throw NoSuchElementException("Rating not found")
