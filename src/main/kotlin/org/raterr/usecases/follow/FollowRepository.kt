@@ -6,14 +6,14 @@ import java.util.Optional
 
 @Repository
 interface FollowRepository : CrudRepository<Follow, Long> {
-    fun findByUserUsernameAndContentTypeAndContentTmdbId(
-        username: String,
+    fun findByUserIdAndContentTypeAndContentTmdbId(
+        userId: Long,
         contentType: String,
         contentTmdbId: Int
     ): Optional<Follow>
 
-    fun existsByUserUsernameAndContentTypeAndContentTmdbId(
-        username: String,
+    fun existsByUserIdAndContentTypeAndContentTmdbId(
+        userId: Long,
         contentType: String,
         contentTmdbId: Int
     ): Boolean

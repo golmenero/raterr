@@ -4,10 +4,10 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface RatingRepository : CrudRepository<Rating, Int> {
-    fun findByMovieTmdbId(tmdbId: Int): List<Rating>
-    fun findByMovieTmdbIdAndUserUsername(tmdbId: Int, username: String): List<Rating>
-    fun findByUserUsername(username: String): List<Rating>
+interface RatingRepository : CrudRepository<Rating, Long> {
+    fun findByMovieId(movieId: Long): List<Rating>
+    fun findByMovieIdAndUserId(movieId: Long, userId: Long): List<Rating>
+    fun findByUserId(userId: Long): List<Rating>
     fun findAllWithoutUser(): List<Rating>
-    fun deleteByMovieTmdbIdAndUserUsername(tmdbId: Int, username: String): Int
+    fun deleteByMovieIdAndUserId(movieId: Long, userId: Long): Int
 }

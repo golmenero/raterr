@@ -42,13 +42,13 @@ class AddRatingController(
 
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
-            val user = userRepository.findById(username)
+            val user = userRepository.findByUsername(username)
                 .orElseThrow { IllegalArgumentException("User not found") }
 
-            val movie = movieRepository.findById(tmdbId).orElse(null)
+            val movie = movieRepository.findByTmdbId(tmdbId).orElse(null)
                 ?: upsertMovie(tmdbClient.movieDetails(tmdbId))
 
-            val existingRating = ratingRepository.findByMovieTmdbIdAndUserUsername(tmdbId, user.username).firstOrNull()
+            val existingRating = ratingRepository.findByMovieIdAndUserId(movie.id!!, user.id!!).firstOrNull()
             if (existingRating != null) {
                 redirectAttributes.addAttribute("id", tmdbId)
                 redirectAttributes.addFlashAttribute("error", "A rating already exists for this movie.")
@@ -56,8 +56,8 @@ class AddRatingController(
             }
 
             val newRating = Rating(
-                movieTmdbId = movie.tmdbId,
-                userUsername = user.username,
+                movieId = movie.id!!,
+                userId = user.id!!,
                 directing = directing,
                 cinematography = cinematography,
                 acting = acting,
@@ -81,7 +81,7 @@ class AddRatingController(
     }
 
     private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
-        val existing = movieRepository.findById(tmdbMovie.id).orElse(null)
+        val existing = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
 
         return if (existing != null) {
             val updated = existing.copy(

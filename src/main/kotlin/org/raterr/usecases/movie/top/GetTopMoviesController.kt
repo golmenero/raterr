@@ -28,7 +28,7 @@ class GetTopMoviesController(
         try {
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
-            val user = userRepository.findById(username).orElse(null)
+            val user = userRepository.findByUsername(username).orElse(null)
 
             if (user == null) {
                 model.addAttribute("tops", emptyList<GetTopMoviesResponse>())
@@ -38,10 +38,12 @@ class GetTopMoviesController(
                 return "top"
             }
 
-            val ratings = ratingRepository.findByUserUsername(user.username)
-            val moviesById = movieRepository.findAllById(ratings.map { it.movieTmdbId }.toSet())
-                .associateBy { it.tmdbId }
-            val tops = getTopMovies(ratings, moviesById, limit, year, category)
+            val ratings = ratingRepository.findByUserId(user.id!!)
+            val movieIds = ratings.map { it.movieId }.toSet()
+            val movies = movieRepository.findAllById(movieIds)
+            val moviesById = movies.associateBy { it.id!! }
+            val tmdbIdByMovieId = movies.associate { it.id!! to it.tmdbId }
+            val tops = getTopMovies(ratings, moviesById, tmdbIdByMovieId, limit, year, category)
 
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
@@ -55,7 +57,8 @@ class GetTopMoviesController(
 
     private fun getTopMovies(
         ratings: List<Rating>,
-        moviesById: Map<Int, Movie>,
+        moviesById: Map<Long, Movie>,
+        tmdbIdByMovieId: Map<Long, Int>,
         limit: Int?,
         year: Int?,
         category: String?
@@ -63,28 +66,34 @@ class GetTopMoviesController(
         val safeLimit = limit?.coerceIn(1, 100)
 
         var filtered = if (year != null) {
-            ratings.filter { moviesById[it.movieTmdbId]?.releaseYear == year }
+            ratings.filter { moviesById[it.movieId]?.releaseYear == year }
         } else {
             ratings
         }
 
         if (category != null && category.isNotBlank()) {
             filtered = filtered.filter { rating ->
-                moviesById[rating.movieTmdbId]?.genres?.contains(category, ignoreCase = true) == true
+                moviesById[rating.movieId]?.genres?.contains(category, ignoreCase = true) == true
             }
         }
 
         val results = filtered
-            .groupBy { it.movieTmdbId }
-            .map { (movieTmdbId, ratingsForMovie) ->
-                val movie = moviesById[movieTmdbId] ?: return@map GetTopMoviesResponse(
-                    tmdbId = movieTmdbId,
-                    title = "Unknown",
-                    releaseYear = null,
-                    posterPath = null,
-                    averageScore = 0.0,
-                    ratingsCount = ratingsForMovie.size
-                )
+            .groupBy { it.movieId }
+            .map { (movieId, ratingsForMovie) ->
+                val movie = moviesById[movieId]
+                val tmdbId = tmdbIdByMovieId[movieId] ?: 0
+
+                if (movie == null) {
+                    return@map GetTopMoviesResponse(
+                        tmdbId = tmdbId,
+                        title = "Unknown",
+                        releaseYear = null,
+                        posterPath = null,
+                        averageScore = 0.0,
+                        ratingsCount = ratingsForMovie.size
+                    )
+                }
+
                 val count = ratingsForMovie.size
 
                 val individualScores = ratingsForMovie.map { rating ->

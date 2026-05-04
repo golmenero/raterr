@@ -43,7 +43,7 @@ class RegisterController(
             return "redirect:/register"
         }
 
-        if (userRepository.existsById(username)) {
+        if (userRepository.existsByUsername(username)) {
             redirectAttributes.addFlashAttribute("error", "Username already exists")
             return "redirect:/register"
         }
@@ -61,11 +61,11 @@ class RegisterController(
             passwordHash = hashedPassword
         )
 
-        userRepository.save(user)
+        val savedUser = userRepository.save(user)
 
         val ratingsWithoutUser = ratingRepository.findAllWithoutUser()
         ratingsWithoutUser.forEach { rating ->
-            ratingRepository.save(rating.copy(userUsername = user.username))
+            ratingRepository.save(rating.copy(userId = savedUser.id!!))
         }
 
         return "redirect:/login"

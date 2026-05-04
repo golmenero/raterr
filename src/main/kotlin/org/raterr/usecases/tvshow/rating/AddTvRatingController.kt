@@ -42,13 +42,13 @@ class AddTvRatingController(
 
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
-            val user = userRepository.findById(username)
+            val user = userRepository.findByUsername(username)
                 .orElseThrow { IllegalArgumentException("User not found") }
 
-            val show = tvShowRepository.findById(tmdbId).orElse(null)
+            val show = tvShowRepository.findByTmdbId(tmdbId).orElse(null)
                 ?: upsertTvShow(tmdbClient.tvShowDetails(tmdbId))
 
-            val existingRating = tvRatingRepository.findByTvShowTmdbIdAndUserUsername(tmdbId, user.username).firstOrNull()
+            val existingRating = tvRatingRepository.findByTvShowIdAndUserId(show.id!!, user.id!!).firstOrNull()
             if (existingRating != null) {
                 redirectAttributes.addAttribute("id", tmdbId)
                 redirectAttributes.addFlashAttribute("error", "A rating already exists for this TV show.")
@@ -56,8 +56,8 @@ class AddTvRatingController(
             }
 
             val newRating = TvRating(
-                tvShowTmdbId = show.tmdbId,
-                userUsername = user.username,
+                tvShowId = show.id!!,
+                userId = user.id!!,
                 directing = directing,
                 cinematography = cinematography,
                 acting = acting,
@@ -81,7 +81,7 @@ class AddTvRatingController(
     }
 
     private fun upsertTvShow(tmdbShow: TmdbTvShow): TvShow {
-        val existing = tvShowRepository.findById(tmdbShow.id).orElse(null)
+        val existing = tvShowRepository.findByTmdbId(tmdbShow.id).orElse(null)
 
         return if (existing != null) {
             val updated = existing.copy(

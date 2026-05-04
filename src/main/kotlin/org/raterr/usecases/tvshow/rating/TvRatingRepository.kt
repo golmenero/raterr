@@ -4,9 +4,9 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TvRatingRepository : CrudRepository<TvRating, Int> {
-    fun findByTvShowTmdbId(tmdbId: Int): List<TvRating>
-    fun findByTvShowTmdbIdAndUserUsername(tmdbId: Int, username: String): List<TvRating>
-    fun findByUserUsername(username: String): List<TvRating>
-    fun deleteByTvShowTmdbIdAndUserUsername(tmdbId: Int, username: String): Int
+interface TvRatingRepository : CrudRepository<TvRating, Long> {
+    fun findByTvShowId(tvShowId: Long): List<TvRating>
+    fun findByTvShowIdAndUserId(tvShowId: Long, userId: Long): List<TvRating>
+    fun findByUserId(userId: Long): List<TvRating>
+    fun deleteByTvShowIdAndUserId(tvShowId: Long, userId: Long): Int
 }

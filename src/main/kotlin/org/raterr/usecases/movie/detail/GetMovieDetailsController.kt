@@ -20,11 +20,11 @@ class GetMovieDetailsController(
     @GetMapping("/movie/rate")
     fun ratePage(@RequestParam("id") tmdbId: Int, model: Model): String {
         try {
-            val movie = getMovieByTmdbId(tmdbId)
-            val ratings = ratingRepository.findByMovieTmdbId(tmdbId)
+            val movie = getOrFetchMovie(tmdbId)
+            val ratings = ratingRepository.findByMovieId(movie.id!!)
             val alreadyRated = ratings.isNotEmpty()
 
-            model.addAttribute("movie", movie)
+            model.addAttribute("movie", buildResponse(movie, ratings))
             model.addAttribute("alreadyRated", alreadyRated)
             return "rate"
         } catch (e: Exception) {
@@ -33,19 +33,13 @@ class GetMovieDetailsController(
         }
     }
 
-    private fun getMovieByTmdbId(tmdbId: Int): GetMovieDetailsResponse {
-        val localMovie = movieRepository.findById(tmdbId).orElse(null)
-
-        val movie = localMovie ?: run {
-            val tmdbMovie = tmdbClient.movieDetails(tmdbId)
-            upsertMovie(tmdbMovie)
-        }
-
-        return buildResponse(movie)
+    private fun getOrFetchMovie(tmdbId: Int): Movie {
+        val localMovie = movieRepository.findByTmdbId(tmdbId).orElse(null)
+        return localMovie ?: upsertMovie(tmdbClient.movieDetails(tmdbId))
     }
 
     private fun upsertMovie(tmdbMovie: TmdbMovie): Movie {
-        val existing = movieRepository.findById(tmdbMovie.id).orElse(null)
+        val existing = movieRepository.findByTmdbId(tmdbMovie.id).orElse(null)
         val genres = tmdbMovie.genres.joinToString(",") { it.name }
 
         return if (existing != null) {
@@ -76,8 +70,7 @@ class GetMovieDetailsController(
         }
     }
 
-    private fun buildResponse(movie: Movie): GetMovieDetailsResponse {
-        val ratings = ratingRepository.findByMovieTmdbId(movie.tmdbId)
+    private fun buildResponse(movie: Movie, ratings: List<org.raterr.usecases.movie.rating.Rating>): GetMovieDetailsResponse {
         val stats = calculateStats(ratings)
 
         return GetMovieDetailsResponse(

@@ -28,7 +28,7 @@ class GetTopTvShowsController(
         try {
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
-            val user = userRepository.findById(username).orElse(null)
+            val user = userRepository.findByUsername(username).orElse(null)
 
             if (user == null) {
                 model.addAttribute("tops", emptyList<GetTopTvShowsResponse>())
@@ -38,10 +38,12 @@ class GetTopTvShowsController(
                 return "tv-top"
             }
 
-            val ratings = tvRatingRepository.findByUserUsername(user.username)
-            val showsById = tvShowRepository.findAllById(ratings.map { it.tvShowTmdbId }.toSet())
-                .associateBy { it.tmdbId }
-            val tops = getTopTvShows(ratings, showsById, limit, year, category)
+            val ratings = tvRatingRepository.findByUserId(user.id!!)
+            val showIds = ratings.map { it.tvShowId }.toSet()
+            val shows = tvShowRepository.findAllById(showIds)
+            val showsById = shows.associateBy { it.id!! }
+            val tmdbIdByShowId = shows.associate { it.id!! to it.tmdbId }
+            val tops = getTopTvShows(ratings, showsById, tmdbIdByShowId, limit, year, category)
 
             model.addAttribute("tops", tops)
             model.addAttribute("selectedYear", year)
@@ -55,7 +57,8 @@ class GetTopTvShowsController(
 
     private fun getTopTvShows(
         ratings: List<TvRating>,
-        showsById: Map<Int, TvShow>,
+        showsById: Map<Long, TvShow>,
+        tmdbIdByShowId: Map<Long, Int>,
         limit: Int?,
         year: Int?,
         category: String?
@@ -63,28 +66,34 @@ class GetTopTvShowsController(
         val safeLimit = limit?.coerceIn(1, 100)
 
         var filtered = if (year != null) {
-            ratings.filter { showsById[it.tvShowTmdbId]?.firstAirYear == year }
+            ratings.filter { showsById[it.tvShowId]?.firstAirYear == year }
         } else {
             ratings
         }
 
         if (category != null && category.isNotBlank()) {
             filtered = filtered.filter { rating ->
-                showsById[rating.tvShowTmdbId]?.genres?.contains(category, ignoreCase = true) == true
+                showsById[rating.tvShowId]?.genres?.contains(category, ignoreCase = true) == true
             }
         }
 
         val results = filtered
-            .groupBy { it.tvShowTmdbId }
-            .map { (showTmdbId, ratingsForShow) ->
-                val show = showsById[showTmdbId] ?: return@map GetTopTvShowsResponse(
-                    tmdbId = showTmdbId,
-                    name = "Unknown",
-                    firstAirYear = null,
-                    posterPath = null,
-                    averageScore = 0.0,
-                    ratingsCount = ratingsForShow.size
-                )
+            .groupBy { it.tvShowId }
+            .map { (showId, ratingsForShow) ->
+                val show = showsById[showId]
+                val tmdbId = tmdbIdByShowId[showId] ?: 0
+
+                if (show == null) {
+                    return@map GetTopTvShowsResponse(
+                        tmdbId = tmdbId,
+                        name = "Unknown",
+                        firstAirYear = null,
+                        posterPath = null,
+                        averageScore = 0.0,
+                        ratingsCount = ratingsForShow.size
+                    )
+                }
+
                 val count = ratingsForShow.size
 
                 val individualScores = ratingsForShow.map { rating ->

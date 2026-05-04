@@ -20,11 +20,11 @@ class GetTvShowDetailsController(
     @GetMapping("/tv/rate")
     fun ratePage(@RequestParam("id") tmdbId: Int, model: Model): String {
         try {
-            val show = getTvShowByTmdbId(tmdbId)
-            val ratings = tvRatingRepository.findByTvShowTmdbId(tmdbId)
+            val show = getOrFetchShow(tmdbId)
+            val ratings = tvRatingRepository.findByTvShowId(show.id!!)
             val alreadyRated = ratings.isNotEmpty()
 
-            model.addAttribute("show", show)
+            model.addAttribute("show", buildResponse(show, ratings))
             model.addAttribute("alreadyRated", alreadyRated)
             return "tv-rate"
         } catch (e: Exception) {
@@ -33,19 +33,13 @@ class GetTvShowDetailsController(
         }
     }
 
-    private fun getTvShowByTmdbId(tmdbId: Int): GetTvShowDetailsResponse {
-        val localShow = tvShowRepository.findById(tmdbId).orElse(null)
-
-        val show = localShow ?: run {
-            val tmdbShow = tmdbClient.tvShowDetails(tmdbId)
-            upsertTvShow(tmdbShow)
-        }
-
-        return buildResponse(show)
+    private fun getOrFetchShow(tmdbId: Int): TvShow {
+        val localShow = tvShowRepository.findByTmdbId(tmdbId).orElse(null)
+        return localShow ?: upsertTvShow(tmdbClient.tvShowDetails(tmdbId))
     }
 
     private fun upsertTvShow(tmdbShow: TmdbTvShow): TvShow {
-        val existing = tvShowRepository.findById(tmdbShow.id).orElse(null)
+        val existing = tvShowRepository.findByTmdbId(tmdbShow.id).orElse(null)
         val genres = tmdbShow.genres.joinToString(",") { it.name }
 
         return if (existing != null) {
@@ -76,8 +70,7 @@ class GetTvShowDetailsController(
         }
     }
 
-    private fun buildResponse(show: TvShow): GetTvShowDetailsResponse {
-        val ratings = tvRatingRepository.findByTvShowTmdbId(show.tmdbId)
+    private fun buildResponse(show: TvShow, ratings: List<org.raterr.usecases.tvshow.rating.TvRating>): GetTvShowDetailsResponse {
         val stats = calculateStats(ratings)
 
         return GetTvShowDetailsResponse(

@@ -1,5 +1,6 @@
 ﻿package org.raterr.usecases.tvshow.rating
 
+import org.raterr.usecases.tvshow.TvShowRepository
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
@@ -10,7 +11,9 @@ import java.util.NoSuchElementException
 
 @Controller
 class DeleteTvRatingController(
-    private val tvRatingRepository: TvRatingRepository
+    private val tvShowRepository: TvShowRepository,
+    private val tvRatingRepository: TvRatingRepository,
+    private val userRepository: org.raterr.usecases.user.UserRepository
 ) {
 
     @PostMapping("/tv/top/delete/{id}")
@@ -22,8 +25,13 @@ class DeleteTvRatingController(
         return try {
             val authentication = SecurityContextHolder.getContext().authentication
             val username = authentication.name
+            val user = userRepository.findByUsername(username)
+                .orElseThrow { NoSuchElementException("User not found") }
 
-            val deletedCount = tvRatingRepository.deleteByTvShowTmdbIdAndUserUsername(tmdbId, username)
+            val show = tvShowRepository.findByTmdbId(tmdbId)
+                .orElseThrow { NoSuchElementException("TV show not found") }
+
+            val deletedCount = tvRatingRepository.deleteByTvShowIdAndUserId(show.id!!, user.id!!)
 
             if (deletedCount == 0) {
                 throw NoSuchElementException("Rating not found")
@@ -35,7 +43,7 @@ class DeleteTvRatingController(
             redirectAttributes.addFlashAttribute("error", "Could not delete the rating.")
             "redirect:/tv/top"
         } catch (e: Exception) {
-            redirectAttributes.addFlashAttribute("error", e.message)
+            redirectAttributes.addFlashAttribute("error", "Could not delete the rating.")
             "redirect:/tv/top"
         }
     }

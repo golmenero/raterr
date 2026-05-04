@@ -26,15 +26,15 @@ class FollowController(
         val user = userRepository.findByUsername(authentication.name)
             .orElseThrow { IllegalStateException("User not found") }
 
-        val existingFollow = followRepository.findByUserUsernameAndContentTypeAndContentTmdbId(
-            user.username, type, tmdbId
+        val existingFollow = followRepository.findByUserIdAndContentTypeAndContentTmdbId(
+            user.id!!, type, tmdbId
         )
 
         if (existingFollow.isPresent) {
             followRepository.delete(existingFollow.get())
         } else {
             val follow = Follow(
-                userUsername = user.username,
+                userId = user.id!!,
                 contentType = type,
                 contentTmdbId = tmdbId
             )

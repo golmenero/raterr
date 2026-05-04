@@ -8,11 +8,17 @@ class TvRatingRepositoryImpl(
     private val jdbcTemplate: JdbcTemplate
 ) {
 
-    fun deleteByTvShowTmdbIdAndUserUsername(tmdbId: Int, username: String): Int {
-        return jdbcTemplate.update(
-            "DELETE FROM tv_ratings WHERE tv_show_tmdb_id = ? AND user_username = ?",
-            tmdbId,
-            username
+    private val tvRatingRowMapper = { rs: java.sql.ResultSet, _: Int ->
+        TvRating(
+            id = rs.getLong("id").takeIf { rs.wasNull() },
+            tvShowId = rs.getLong("tv_show_id"),
+            userId = rs.getLong("user_id"),
+            directing = rs.getDouble("directing"),
+            cinematography = rs.getDouble("cinematography"),
+            acting = rs.getDouble("acting"),
+            soundtrack = rs.getDouble("soundtrack"),
+            screenplay = rs.getDouble("screenplay"),
+            createdAtEpochMs = rs.getLong("created_at_epoch_ms")
         )
     }
 }
