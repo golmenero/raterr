@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestClient
 
 @Component
 class TmdbClient(
     @Value("\${raterr.tmdb.api-key}")
     private val apiKey: String,
-    
+
     @Value("\${raterr.tmdb.base-url}")
     private val baseUrl: String = "https://api.themoviedb.org/3"
 ) {
-    private val webClient: WebClient = WebClient.builder()
+    private val restClient: RestClient = RestClient.builder()
         .baseUrl(baseUrl)
         .build()
 
@@ -22,7 +22,7 @@ class TmdbClient(
         if (query.isBlank()) return emptyList()
         requireApiKey()
 
-        return webClient.get()
+        return restClient.get()
             .uri { builder ->
                 builder.path("/search/movie")
                     .queryParam("api_key", apiKey)
@@ -33,8 +33,7 @@ class TmdbClient(
                     .build()
             }
             .retrieve()
-            .bodyToMono(TmdbSearchResponse::class.java)
-            .block()
+            .body(TmdbSearchResponse::class.java)
             ?.results
             ?: emptyList()
     }
@@ -42,7 +41,7 @@ class TmdbClient(
     fun movieDetails(tmdbId: Int): TmdbMovie {
         requireApiKey()
 
-        return webClient.get()
+        return restClient.get()
             .uri { builder ->
                 builder.path("/movie/{id}")
                     .queryParam("api_key", apiKey)
@@ -50,8 +49,7 @@ class TmdbClient(
                     .build(tmdbId)
             }
             .retrieve()
-            .bodyToMono(TmdbMovie::class.java)
-            .block()
+            .body(TmdbMovie::class.java)
             ?: throw RuntimeException("Could not fetch movie details")
     }
 
@@ -59,7 +57,7 @@ class TmdbClient(
         if (query.isBlank()) return emptyList()
         requireApiKey()
 
-        return webClient.get()
+        return restClient.get()
             .uri { builder ->
                 builder.path("/search/tv")
                     .queryParam("api_key", apiKey)
@@ -70,8 +68,7 @@ class TmdbClient(
                     .build()
             }
             .retrieve()
-            .bodyToMono(TmdbTvShowSearchResponse::class.java)
-            .block()
+            .body(TmdbTvShowSearchResponse::class.java)
             ?.results
             ?: emptyList()
     }
@@ -79,7 +76,7 @@ class TmdbClient(
     fun tvShowDetails(tmdbId: Int): TmdbTvShow {
         requireApiKey()
 
-        return webClient.get()
+        return restClient.get()
             .uri { builder ->
                 builder.path("/tv/{id}")
                     .queryParam("api_key", apiKey)
@@ -87,8 +84,7 @@ class TmdbClient(
                     .build(tmdbId)
             }
             .retrieve()
-            .bodyToMono(TmdbTvShow::class.java)
-            .block()
+            .body(TmdbTvShow::class.java)
             ?: throw RuntimeException("Could not fetch TV show details")
     }
 
